@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { User } from "../../models/User.js";
-import { TOKEN_SECRET, ADMIN_PASSWORD } from "../../config/token.js";
+import { TOKEN_SECRET, ADMIN_PASSWORD, ADMIN_ROLE, SUPER_ADMIN_PASSWORD, SUPER_ADMIN_ROLE, USER_ROLE } from "../../config/token.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -11,14 +11,39 @@ const hashPassword = async (password) => {
 };
 
 export const authService = {
-  // Registro de usuario normal
   registerUser: async (username, email, password) => {
+    const existingUser = await User.findOne({ where: { username } });
+    if (existingUser) {
+      throw new Error("Username already exists");
+    }
+    const existingEmail = await User.findOne({ where: { email } });
+    if (existingEmail) {
+      throw new Error("Email already exists");
+    }
     const hashedPassword = await hashPassword(password);
     const newUser = await User.create({
       username,
       email,
       password: hashedPassword,
       role: "user",
+    });
+    return newUser;
+  },
+
+  // Registro de superadministrador (solo si el adminPassword es correcto)
+  registerSuperAdmin: async (username, email, password, adminPassword, superAdminPassword) => {
+    if (adminPassword !== ADMIN_PASSWORD) {
+      throw new Error("Invalid admin password");
+    }
+    if (superAdminPassword !== SUPER_ADMIN_PASSWORD) {
+      throw new Error("Invalid super admin password");
+    }
+    const hashedPassword = await hashPassword(password);
+    const newUser = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+      role: SUPER_ADMIN_ROLE,
     });
     return newUser;
   },
@@ -45,14 +70,14 @@ export const authService = {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new Error("Invalid credentials");
     }
-  
+
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role },
       TOKEN_SECRET,
       { expiresIn: "1h" }
     );
-  
-    return { token, userId: user.id };
+
+    return { token, userId: user.id, role: user.role };
   },
 
   // Obtener todos los usuarios (solo para administradores)
@@ -70,4 +95,14 @@ export const authService = {
     const user = await User.findByPk(userId);
     return user;
   },
+  verifyToken: (token) => {
+    try {
+      const decoded = jwt.verify(token, TOKEN_SECRET);
+      return { token, userId: decoded.id, role: decoded.role };
+
+    } catch (err) {
+      throw new Error("Invalid or expired token");
+    }
+  },
 };
+
