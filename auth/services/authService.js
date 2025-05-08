@@ -98,7 +98,7 @@ export const authService = {
   verifyToken: (token) => {
     try {
       const decoded = jwt.verify(token, TOKEN_SECRET);
-      return { token, userId: decoded.id, role: decoded.role };
+      return { token, userId: decoded.id, role: decoded.role, username: decoded.username };
 
     } catch (err) {
       throw new Error("Invalid or expired token");

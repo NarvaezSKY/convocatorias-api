@@ -48,7 +48,7 @@ export const Convocatoria = sequelize.define('Convocatoria', {
     allowNull: true
   },
   observaciones: {
-    type: DataTypes.STRING(250),
+    type: DataTypes.STRING(2000),
     allowNull: true
   },
   user_id: {
@@ -58,7 +58,11 @@ export const Convocatoria = sequelize.define('Convocatoria', {
       model: 'users',
       key: 'id'
     }
-  }
+  },
+  url: {
+    type: DataTypes.STRING(500),
+    allowNull: true
+  },
   
 }, {
   tableName: 'convocatoria',

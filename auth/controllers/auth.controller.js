@@ -59,7 +59,7 @@ export const login = async (req, res) => {
   }
   try {
     const { token, userId, role } = await authService.login(username, password);
-    res.status(200).json({ token, userId, role });
+    res.status(200).json({ token, userId, role, username });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

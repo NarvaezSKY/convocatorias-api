@@ -17,7 +17,7 @@ export const getConvocatoriasController = async (req, res) => {
 
 export const createConvocatoriaController = async (req, res) => {
   try {
-    const userId = req.user.id; // desde el token verificado
+    const userId = req.user.id;
     const data = req.body;
     const convocatoria = await createConvocatoria(data, userId);
     res.status(201).json(convocatoria);
