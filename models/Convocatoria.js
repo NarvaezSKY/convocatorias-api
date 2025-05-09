@@ -31,10 +31,6 @@ export const Convocatoria = sequelize.define('Convocatoria', {
     type: DataTypes.STRING(250),
     allowNull: true
   },
-  valor: {
-    type: DataTypes.DECIMAL(15, 2),
-    allowNull: true
-  },
   fecha_aprobacion: {
     type: DataTypes.DATEONLY,
     allowNull: true
@@ -61,6 +57,19 @@ export const Convocatoria = sequelize.define('Convocatoria', {
   },
   url: {
     type: DataTypes.STRING(500),
+    allowNull: true
+  },
+
+    valor_solicitado: {
+    type: DataTypes.DECIMAL(15, 2),
+    allowNull: true
+  },
+    valor_aprobado: {
+    type: DataTypes.DECIMAL(15, 2),
+    allowNull: true
+  },
+    diferencia_presupuesto: {
+    type: DataTypes.DECIMAL(15, 2),
     allowNull: true
   },
   

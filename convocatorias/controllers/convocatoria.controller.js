@@ -4,6 +4,7 @@ import {
   updateConvocatoria,
   deleteConvocatoria,
   filterConvocatorias,
+  getConvocatoriaById,
 } from "../services/convocatoria.service.js";
 
 export const getConvocatoriasController = async (req, res) => {
@@ -59,6 +60,19 @@ export const filterConvocatoriasController = async (req, res) => {
 
     const results = await filterConvocatorias(filters);
     res.json(results);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getConvocatoriaByIdController = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const convocatoria = await getConvocatoriaById(id);
+    if (!convocatoria) {
+      return res.status(404).json({ message: "Convocatoria not found" });
+    }
+    res.json(convocatoria);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

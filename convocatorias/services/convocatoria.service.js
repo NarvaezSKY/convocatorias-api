@@ -6,8 +6,18 @@ export const getAllConvocatorias = async () => {
 };
 
 export const createConvocatoria = async (data, userId) => {
-  return await Convocatoria.create({ ...data, user_id: userId });
+  const valorSolicitado = parseFloat(data.valor_solicitado) || 0;
+  const valorAprobado = parseFloat(data.valor_aprobado) || 0;
+
+  const diferenciaPresupuesto = valorSolicitado - valorAprobado;
+
+  return await Convocatoria.create({
+    ...data,
+    user_id: userId,
+    diferencia_presupuesto: diferenciaPresupuesto
+  });
 };
+
 
 export const updateConvocatoria = async (id, data) => {
   const convocatoria = await Convocatoria.findByPk(id);
@@ -36,4 +46,10 @@ export const filterConvocatorias = async (filters) => {
   return await Convocatoria.findAll({
     where: whereClause
   });
+};
+
+export const getConvocatoriaById = async (id) => {
+  const convocatoria = await Convocatoria.findByPk(id);
+  if (!convocatoria) throw new Error('Convocatoria not found');
+  return convocatoria;
 };
