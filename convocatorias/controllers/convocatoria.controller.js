@@ -5,6 +5,7 @@ import {
   deleteConvocatoria,
   filterConvocatorias,
   getConvocatoriaById,
+  generateConvocatoriasReport,
 } from "../services/convocatoria.service.js";
 
 export const getConvocatoriasController = async (req, res) => {
@@ -50,20 +51,39 @@ export const deleteConvocatoriaController = async (req, res) => {
 
 export const filterConvocatoriasController = async (req, res) => {
   try {
-    const filters = req.query;
+    const { report, ...filters } = req.query;
 
-    if (Object.keys(filters).length === 0) {
-      return res
-        .status(400)
-        .json({ message: "At least one filter is required" });
-    }
+    // if (Object.keys(filters).length === 0) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "At least one filter is required" });
+    // }
 
     const results = await filterConvocatorias(filters);
+
+    if (report === "true") {
+      const workbook = await generateConvocatoriasReport(results);
+      const buffer = await workbook.xlsx.writeBuffer();
+
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=reporte.xlsx"
+      );
+      res.send(buffer);
+      return;
+    }
+
     res.json(results);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 export const getConvocatoriaByIdController = async (req, res) => {
   try {

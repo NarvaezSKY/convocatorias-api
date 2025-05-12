@@ -1,4 +1,5 @@
 import { Op } from 'sequelize';
+import ExcelJS from 'exceljs';
 import { Convocatoria } from '../../models/Convocatoria.js';
 
 export const getAllConvocatorias = async () => {
@@ -46,6 +47,28 @@ export const filterConvocatorias = async (filters) => {
   return await Convocatoria.findAll({
     where: whereClause
   });
+};
+
+export const generateConvocatoriasReport = async (data) => {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Convocatorias');
+
+  if (data.length === 0) {
+    worksheet.addRow(['No data available']);
+  } else {
+    const columns = Object.keys(data[0].dataValues).map(key => ({
+      header: key,
+      key: key,
+      width: 20,
+    }));
+    worksheet.columns = columns;
+
+    data.forEach(row => {
+      worksheet.addRow(row.dataValues);
+    });
+  }
+
+  return workbook;
 };
 
 export const getConvocatoriaById = async (id) => {
