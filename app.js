@@ -9,7 +9,7 @@ const app = express();
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://test-sena-book-git-ft-2335-senathreads.vercel.app",
+    "https://seguimiento-innovacion-y-competitividad.vercel.app",
   ],
   optionsSuccessStatus: 200,
   credentials: true,
