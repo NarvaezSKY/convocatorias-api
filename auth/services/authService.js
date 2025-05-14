@@ -120,6 +120,7 @@ export const authService = {
         role: decoded.role,
         username: decoded.username
       };
+    // eslint-disable-next-line no-unused-vars
     } catch (err) {
       throw new Error("Invalid or expired token");
     }

@@ -1,6 +1,5 @@
 import ExcelJS from 'exceljs';
 import { Convocatoria } from '../../models/Convocatoria.js';
-import mongoose from 'mongoose';
 
 export const getAllConvocatorias = async () => {
   return await Convocatoria.find().populate('user_id');
@@ -41,7 +40,7 @@ export const filterConvocatorias = async (filters) => {
 
   for (const key in filters) {
     if (filters[key]) {
-      query[key] = { $regex: filters[key], $options: 'i' }; // insensitive like
+      query[key] = { $regex: filters[key], $options: 'i' };
     }
   }
 

@@ -14,7 +14,10 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "syntax-check": "node --check index.js",
+    "lint": "eslint . --ext .js",
+    "check": "yarn syntax-check && yarn lint"
   },
   "type": "module",
   "name": "jwt-authentication",
@@ -22,5 +25,8 @@
   "main": "index.js",
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "eslint": "^9.26.0"
+  }
 }
