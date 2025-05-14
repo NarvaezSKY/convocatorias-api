@@ -1,79 +1,21 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../database/database.js';
+import mongoose from 'mongoose';
 
-export const Convocatoria = sequelize.define('Convocatoria', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true
-  },
-  convocatoria: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  consecutivo: {
-    type: DataTypes.STRING(50),
-    allowNull: true
-  },
-  direccion_oficina_regional: {
-    type: DataTypes.STRING(200),
-    allowNull: true
-  },
-  tipo_postulacion: {
-    type: DataTypes.STRING(50),
-    allowNull: true
-  },
-  nuevo_estado: {
-    type: DataTypes.STRING(50),
-    allowNull: true
-  },
-  nombre: {
-    type: DataTypes.STRING(250),
-    allowNull: true
-  },
-  fecha_aprobacion: {
-    type: DataTypes.DATEONLY,
-    allowNull: true
-  },
-  fecha_inicio: {
-    type: DataTypes.DATEONLY,
-    allowNull: true
-  },
-  fecha_fin: {
-    type: DataTypes.DATEONLY,
-    allowNull: true
-  },
-  observaciones: {
-    type: DataTypes.STRING(2000),
-    allowNull: true
-  },
-  user_id: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    references: {
-      model: 'users',
-      key: 'id'
-    }
-  },
-  url: {
-    type: DataTypes.STRING(500),
-    allowNull: true
-  },
+const convocatoriaSchema = new mongoose.Schema({
+  convocatoria: { type: Number, required: true },
+  consecutivo: { type: String, maxlength: 50 },
+  direccion_oficina_regional: { type: String, maxlength: 200 },
+  tipo_postulacion: { type: String, maxlength: 50 },
+  nuevo_estado: { type: String, maxlength: 50 },
+  nombre: { type: String, maxlength: 250 },
+  fecha_aprobacion: { type: Date },
+  fecha_inicio: { type: Date },
+  fecha_fin: { type: Date },
+  observaciones: { type: String, maxlength: 2000 },
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  url: { type: String, maxlength: 500 },
+  valor_solicitado: { type: Number },
+  valor_aprobado: { type: Number },
+  diferencia_presupuesto: { type: Number },
+}, { timestamps: false });
 
-    valor_solicitado: {
-    type: DataTypes.DECIMAL(15, 2),
-    allowNull: true
-  },
-    valor_aprobado: {
-    type: DataTypes.DECIMAL(15, 2),
-    allowNull: true
-  },
-    diferencia_presupuesto: {
-    type: DataTypes.DECIMAL(15, 2),
-    allowNull: true
-  },
-  
-}, {
-  tableName: 'convocatoria',
-  timestamps: false
-});
+export const Convocatoria = mongoose.model('Convocatoria', convocatoriaSchema);
