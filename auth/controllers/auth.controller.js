@@ -98,14 +98,13 @@ export const profile = async (req, res) => {
 };
 
 // Actualizar el perfil del usuario
-export const updateProfile = async (req, res) => {
-  const { username, email, password } = req.body;
+export const updateRole = async (req, res) => {
+  const { userId, newRole } = req.body;
+
   try {
     const user = await authService.updateProfile(
-      req.user.id,
-      username,
-      email,
-      password
+      userId,
+      newRole
     );
     res.status(200).json(user);
   } catch (err) {

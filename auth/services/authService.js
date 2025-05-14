@@ -30,6 +30,16 @@ export const authService = {
     return newUser;
   },
 
+  updateProfile: async (userId, newRole) => {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    user.role = newRole;
+    await user.save();
+    return user;
+  },
+
   // Registro de superadministrador (solo si el adminPassword es correcto)
   registerSuperAdmin: async (username, email, password, adminPassword, superAdminPassword) => {
     if (adminPassword !== ADMIN_PASSWORD) {
@@ -105,4 +115,6 @@ export const authService = {
     }
   },
 };
+
+
 
