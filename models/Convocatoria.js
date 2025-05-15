@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const convocatoriaSchema = new mongoose.Schema({
-  convocatoria: { type: Number, required: true },
+  convocatoria: { type: String, required: true },
   consecutivo: { type: String, maxlength: 50 },
   direccion_oficina_regional: { type: String, maxlength: 200 },
   tipo_postulacion: { type: String, maxlength: 50 },
