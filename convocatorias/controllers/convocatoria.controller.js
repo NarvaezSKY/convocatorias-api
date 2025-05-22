@@ -21,6 +21,10 @@ export const createConvocatoriaController = async (req, res) => {
   try {
     const userId = req.user.id;
     const data = req.body;
+
+    if (!data) {
+      return res.status(400).json({ message: "Data is required" });
+    }
     const convocatoria = await createConvocatoria(data, userId);
     res.status(201).json(convocatoria);
   } catch (error) {

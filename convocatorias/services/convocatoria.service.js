@@ -1,9 +1,24 @@
 import ExcelJS from "exceljs";
 import { Convocatoria } from "../../models/Convocatoria.js";
+import { addConvocatoriaToSheet, updateConvocatoriaInSheet, deleteConvocatoriaFromSheet } from "../sheets/googleSheets.service.js";
 
 export const getAllConvocatorias = async () => {
   return await Convocatoria.find().populate("user_id");
 };
+
+// export const createConvocatoria = async (data, userId) => {
+//   const valorSolicitado = parseFloat(data.valor_solicitado) || 0;
+//   const valorAprobado = parseFloat(data.valor_aprobado) || 0;
+//   const diferenciaPresupuesto = valorSolicitado - valorAprobado;
+
+//   const nuevaConvocatoria = new Convocatoria({
+//     ...data,
+//     user_id: userId,
+//     diferencia_presupuesto: diferenciaPresupuesto,
+//   });
+
+//   return await nuevaConvocatoria.save();
+// };
 
 export const createConvocatoria = async (data, userId) => {
   const valorSolicitado = parseFloat(data.valor_solicitado) || 0;
@@ -16,7 +31,10 @@ export const createConvocatoria = async (data, userId) => {
     diferencia_presupuesto: diferenciaPresupuesto,
   });
 
-  return await nuevaConvocatoria.save();
+  const result = await nuevaConvocatoria.save();
+  await addConvocatoriaToSheet(result);
+
+  return result;
 };
 
 export const updateConvocatoria = async (id, data) => {
@@ -28,6 +46,8 @@ export const updateConvocatoria = async (id, data) => {
   const valorSolicitado = parseFloat(convocatoria.valor_solicitado) || 0;
   const valorAprobado = parseFloat(convocatoria.valor_aprobado) || 0;
   convocatoria.diferencia_presupuesto = valorSolicitado - valorAprobado;
+  
+  await updateConvocatoriaInSheet(convocatoria);
 
   return await convocatoria.save();
 };
@@ -37,6 +57,7 @@ export const deleteConvocatoria = async (id) => {
   if (!convocatoria) throw new Error("Convocatoria not found");
 
   await convocatoria.deleteOne();
+  await deleteConvocatoriaFromSheet(id);
   return { message: "Convocatoria deleted" };
 };
 
