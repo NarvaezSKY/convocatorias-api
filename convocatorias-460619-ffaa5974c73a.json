@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "convocatorias-460619",
+  "private_key_id": "ffaa5974c73a10adcabf398a7b07a2d27ea70179",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCXsf03lG4xo5NV\nrZ1DR5gyRSbokm7DBiw2Jrv9yFbSobWeTcLK2t/aQVoAZGNoiyxV0LTcPBK70wVs\nxKemqe4L+v9QyhcVLCxJUcWOA38pS7V7HbU0YtzVTcvqLGqGuzRP0imMcFBiNwny\nT8s040xFmnGPFOIizJWRCNYDF15tAvpAweW30YdSeATE4OtjFRYZy3O1FjukfnDS\nL2oZJytBUk9Hj1Gf7cDwzpipKxzWBxC0DZhO6Dbu5ouK3UqLIQa6EWEgCoxXCC9t\neCIOmiWihyYgCVNz0RizMcFd1DdW+aZQbJO28XJX+v5XcThtsMhOJfQ1Q8Iv+37w\naLYp2pidAgMBAAECggEABZnzHiDajs5ygeFx3jHux0aT4LkobJAiSZDVlsgQrFxY\ngV9vn0cdWhyeCiBcEpNx8p25KmfwFGHNqkkYOgOWjz062vREoT1l+u6lF5DcBuyI\nZ4BycOYcQzCOLjzg7zBK1XqicvgnMY7EzNUcw4Z0Ch6wGcgZgz/7N94PAUzBVgq0\n2gF2dWSSTU+kdOziGWdve5UR7CjdWYJ6PF3lDwG2fLrHVCejgLwcNzc5m4m0r8VV\nBjGOHnwK5Nk/7fDxugZ2yyMFq8V+BBzaLJ6t8IyzxRAKVgPpXx+umVH9AQzYTs9I\neGHbVEvEJ+6uv6MFcbberzfx4sZZorI7yFcWSit72wKBgQDVYIbNMGQH4i6vqdwk\nPc+/Acp7LS95WSkUFc75Z9TQP4j78Ua270ztePXER81xF2OBf1mZadHkgSLEqf1I\npo6fMaxDrtBbTEtWA4DJXjvyn0JYo+wkU6nVa29Kc8SCf9yCilbRO9z5Ue8VnnYs\nEnQ3lcIq7D7zcvYymVp4f/cznwKBgQC1/zzl4Wuu0bGJYrKxYU0bb67ql28TlI9t\n9HNEFNafSDyaQgM6YWC8l4Qc8lmlx0ElfmAOsY9gExcbggzuyQjyDMlMlox4r2R7\nnMq496IHGG4P5p14f0liTM3C94U3z/nOSebFpG2uNp+xxv08n4Z+FZUZsUiIZskn\nCtuwhFAqQwKBgQCMclGoQ37EFaOHKnXlQO46GjKtqwtBg2dfeg9W6HoSbI98zc4u\n4QowkNqrzFs0YiGz/h/6s8Vc84bwDbfSlxbvP+HUVv976Jb50ap2YNlylFM2RwdK\nzerOuD1zswmYoBKDtgz5Ab8sODr3bur3jVoDsEYyvHefBH96xKfhAtGynwKBgDIY\n6DJ/Mp0Uq8IdoQKivg7nV0bMGI9TPYgO2gvLkKiXwdbUhP70/yPqsTsmmva/OneP\nqfFhfw37M0knK1gvjn7SdjbW2iP+Y7KDHmp7/+XkG6fU21Pn9dNRQPKCH/GVFjZq\nsVOGR4rFDoBpPhwJ7YOXfUttOYISiRxuKLsWMNrxAoGBAJAJ4cbpwW6XZOhHx3pv\n/v5wTyF7uhwHdxQpQkafGjvpYFf0R9JfwsjhhraIcWl1rrdkMOQrZDrscd5FwCuL\nwpkffVb6MLkmxWa4zf0p9RzNqFGOZjnxbqkBvtKrmAwB8TU6HdxN+/97oET7li2T\nzoHVmMlAvbMXFoCg2h+yPljp\n-----END PRIVATE KEY-----\n",
+  "client_email": "convocatoriasidi@convocatorias-460619.iam.gserviceaccount.com",
+  "client_id": "106495156919404184539",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/convocatoriasidi%40convocatorias-460619.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
