@@ -1,10 +1,13 @@
 import 'dotenv/config'
 import { google } from 'googleapis';
-import * as path from 'path'
-import { GOOGLE_KEY_JSON_PATH } from '../../config/token.js';
+
+let credentials;
+if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+    credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+}
 
 const auth = new google.auth.GoogleAuth({
-    keyFile: path.join(import.meta.dirname, "..", "..", GOOGLE_KEY_JSON_PATH),
+    credentials,
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
