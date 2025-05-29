@@ -1,6 +1,11 @@
 import ExcelJS from "exceljs";
 import { Convocatoria } from "../../models/Convocatoria.js";
-import { addConvocatoriaToSheet, updateConvocatoriaInSheet, deleteConvocatoriaFromSheet } from "../sheets/googleSheets.service.js";
+import { PlanFinanciero } from "../../models/PlanFinanciero.js";
+import {
+  addConvocatoriaToSheet,
+  updateConvocatoriaInSheet,
+  deleteConvocatoriaFromSheet,
+} from "../sheets/googleSheets.service.js";
 
 export const getAllConvocatorias = async () => {
   return await Convocatoria.find().populate("user_id");
@@ -46,7 +51,7 @@ export const updateConvocatoria = async (id, data) => {
   const valorSolicitado = parseFloat(convocatoria.valor_solicitado) || 0;
   const valorAprobado = parseFloat(convocatoria.valor_aprobado) || 0;
   convocatoria.diferencia_presupuesto = valorSolicitado - valorAprobado;
-  
+
   await updateConvocatoriaInSheet(convocatoria);
 
   return await convocatoria.save();
@@ -89,6 +94,32 @@ export const generateConvocatoriasReport = async (data) => {
 
     data.forEach((row) => {
       worksheet.addRow(row._doc);
+    });
+  }
+  if (data.length === 1) {
+    const convocatoria = data[0];
+    const planFinanciero = await PlanFinanciero.findOne({
+      convocatoria: convocatoria._id,
+    });
+
+    const planSheet = workbook.addWorksheet("Plan Financiero");
+
+    const filas = planFinanciero.structure.rows; // ["Actividad 1", "Actividad 2", ...]
+    const columnas = planFinanciero.structure.columns; // ["Meses", "Mes 1", "Mes 2", ...]
+    const dataMatriz = planFinanciero.data; // Map<String, Map<String, String>>
+
+    // Primera fila: encabezados (Meses, Mes 1, Mes 2, ...)
+    planSheet.addRow(columnas);
+
+    // Filas de datos
+    filas.forEach((actividad) => {
+      const fila = [actividad];
+      for (let i = 1; i < columnas.length; i++) {
+        const col = columnas[i];
+        const valor = dataMatriz.get(actividad)?.get(col) || "";
+        fila.push(valor);
+      }
+      planSheet.addRow(fila);
     });
   }
 

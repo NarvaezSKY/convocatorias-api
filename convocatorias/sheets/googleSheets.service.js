@@ -30,7 +30,6 @@ export const addConvocatoriaToSheet = async (convocatoria) => {
     });
 };
 
-
 const getSheetIdByName = async (sheetName) => {
     const res = await googleSheetsClient.spreadsheets.get({
         spreadsheetId: SPREAD_SHEET_ID,

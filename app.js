@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import authRouter from "./auth/routes/auth.routes.js";
 import convocatoriasRouter from "./convocatorias/routes/convocatoria.routes.js";
+import planFinancieroRouter from './planFinanciero/routes/pF.routes.js';
 import morgan from "morgan";
 
 const app = express();
@@ -20,7 +21,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(morgan("dev"));
+
 app.use("/api/auth", authRouter);
 app.use("/api/convocatorias", convocatoriasRouter);
+app.use("/api/plan-financiero", planFinancieroRouter);
 
 export default app;
