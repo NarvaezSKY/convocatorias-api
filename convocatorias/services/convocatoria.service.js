@@ -11,20 +11,6 @@ export const getAllConvocatorias = async () => {
   return await Convocatoria.find().populate("user_id");
 };
 
-// export const createConvocatoria = async (data, userId) => {
-//   const valorSolicitado = parseFloat(data.valor_solicitado) || 0;
-//   const valorAprobado = parseFloat(data.valor_aprobado) || 0;
-//   const diferenciaPresupuesto = valorSolicitado - valorAprobado;
-
-//   const nuevaConvocatoria = new Convocatoria({
-//     ...data,
-//     user_id: userId,
-//     diferencia_presupuesto: diferenciaPresupuesto,
-//   });
-
-//   return await nuevaConvocatoria.save();
-// };
-
 export const createConvocatoria = async (data, userId) => {
   const valorSolicitado = parseFloat(data.valor_solicitado) || 0;
   const valorAprobado = parseFloat(data.valor_aprobado) || 0;
@@ -61,6 +47,9 @@ export const deleteConvocatoria = async (id) => {
   const convocatoria = await Convocatoria.findById(id);
   if (!convocatoria) throw new Error("Convocatoria not found");
 
+  const planFinanciero = await PlanFinanciero.findOne({ convocatoria: id });
+  if (planFinanciero) await PlanFinanciero.deleteOne({ convocatoria: id });
+
   await convocatoria.deleteOne();
   await deleteConvocatoriaFromSheet(id);
   return { message: "Convocatoria deleted" };
@@ -81,19 +70,28 @@ export const filterConvocatorias = async (filters) => {
 export const generateConvocatoriasReport = async (data) => {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet("Convocatorias");
+  const excludedKeys = ["_id", "user_id", "__v"];
 
   if (data.length === 0) {
     worksheet.addRow(["No data available"]);
   } else {
-    const columns = Object.keys(data[0]._doc).map((key) => ({
-      header: key,
-      key: key,
-      width: 20,
-    }));
+    const columns = Object.keys(data[0]._doc)
+      .filter((key) => !excludedKeys.includes(key))
+      .map((key) => ({
+        header: key,
+        key: key,
+        width: 20,
+      }));
     worksheet.columns = columns;
 
     data.forEach((row) => {
-      worksheet.addRow(row._doc);
+      const cleanRow = {};
+      for (const key in row._doc) {
+        if (!excludedKeys.includes(key)) {
+          cleanRow[key] = row._doc[key];
+        }
+      }
+      worksheet.addRow(cleanRow);
     });
   }
   if (data.length === 1) {
