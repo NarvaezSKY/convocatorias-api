@@ -6,22 +6,26 @@ const planFinancieroSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Convocatoria",
       required: true,
-      unique: true, // Asegura que solo haya un plan por convocatoria
+      unique: true,
     },
     metadata: {
       rows: { type: Number, required: true },
       columns: { type: Number, required: true },
+      totalExecutionPercentage: { type: Number, default: 0 },
       createdAt: { type: Date, default: Date.now },
     },
     structure: {
-      rows: [{ type: String, required: true }], // Ej: ["Actividad 1", "Actividad 2"]
-      columns: [{ type: String, required: true }], // Ej: ["Meses", "Mes 1", "Mes 2"]
+      rows: [{ type: String, required: true }],
+      columns: [{ type: String, required: true }],
     },
     data: {
-      type: Map,
+      type: Object,
       of: {
-        type: Map,
-        of: String, // Permite valores como "1", "2",..."
+        type: Object,
+        of: {
+          proyectado: { type: String, default: "" },
+          ejecutado: { type: String, default: "" },
+        },
       },
       required: true,
     },
