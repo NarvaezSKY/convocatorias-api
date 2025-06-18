@@ -12,7 +12,7 @@ import {
 } from "../controllers/auth.controller.js";
 import { verifyRole } from "../../shared/middlewares/verifyRole.js";
 import { verifyToken } from "../../shared/middlewares/verifyToken.js";
-import { ADMIN_ROLE, SUPER_ADMIN_ROLE } from "../../config/token.js";
+import { ADMIN_ROLE, SUPER_ADMIN_ROLE, DINAMIZADOR_ROLE } from "../../config/token.js";
 
 const router = express.Router();
 
@@ -28,7 +28,7 @@ router.get("/verify", verifyToken, verifyTokenController);
 
 router.post("/login", login);
 
-router.get("/users", verifyToken, verifyRole(SUPER_ADMIN_ROLE), getUsers);
+router.get("/users", verifyToken, verifyRole([SUPER_ADMIN_ROLE, DINAMIZADOR_ROLE]), getUsers);
 router.get(
   "/user/:username",
   verifyToken,
@@ -37,7 +37,7 @@ router.get(
 );
 router.get("/profile", verifyToken, profile);
 
-router.patch("/update-role", verifyToken, verifyRole(SUPER_ADMIN_ROLE), updateRole
+router.patch("/update-role", verifyToken, verifyRole([SUPER_ADMIN_ROLE, DINAMIZADOR_ROLE]), updateRole
 );
 
 export default router;

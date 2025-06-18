@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { TOKEN_SECRET } from "../../config/token.js";
 
-export const verifyRole = (requiredRole) => {
+export const verifyRole = (allowedRoles) => {
   return (req, res, next) => {
     const token = req.headers["authorization"]?.split(" ")[1];
 
@@ -16,7 +16,10 @@ export const verifyRole = (requiredRole) => {
 
       req.user = decoded;
 
-      if (requiredRole && req.user.role !== requiredRole) {
+      // allowedRoles puede ser un string o un array
+      const rolesArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+
+      if (!rolesArray.includes(req.user.role)) {
         return res
           .status(403)
           .json({ message: "Access forbidden: Insufficient role" });
