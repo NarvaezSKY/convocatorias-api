@@ -157,12 +157,12 @@ export const forgotPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
   if (!token || !newPassword) {
-    return res.status(400).json({ message: "Token and new password are required" });
+    return res.status(400).json({ message: "El token y la nueva contraseña son requeridos" });
   }
 
   try {
     await authService.resetPassword(token, newPassword);
-    res.status(200).json({ message: "Password reset successfully" });
+    res.status(200).json({ message: "La contraseña se ha restablecido correctamente" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
