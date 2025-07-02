@@ -112,6 +112,20 @@ export const updateRole = async (req, res) => {
   }
 };
 
+export const updateStatus = async (req, res) => {
+  const { userId, newStatus } = req.body;
+
+  try {
+    const user = await authService.updateStatus(
+      userId,
+      newStatus
+    );
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 export const verifyToken = async (req, res) => {
   const headers = req.headers["authorization"];
   const token = headers.split(" ")[1];

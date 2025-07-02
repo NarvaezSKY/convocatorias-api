@@ -48,6 +48,16 @@ export const authService = {
     return user;
   },
 
+  updateStatus: async (userId, newStatus) => {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    user.estado = newStatus;
+    await user.save();
+    return user;
+  },
+
   registerSuperAdmin: async (username, email, password, adminPassword, superAdminPassword) => {
     if (adminPassword !== ADMIN_PASSWORD) {
       throw new Error("Invalid admin password");
