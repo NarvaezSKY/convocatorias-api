@@ -2,13 +2,13 @@ import { authService } from "../services/authService.js";
 
 // Registrar un usuario normal
 export const registerUser = async (req, res) => {
-  const { username, email, password } = req.body;
-  if (!username || !email || !password) {
+  const { username, email, password, role, telefono } = req.body;
+  if (!username || !email || !password || !role || !telefono) {
     return res.status(400).json({ message: "Username, email and password are required" });
   }
 
   try {
-    const newUser = await authService.registerUser(username, email, password);
+    const newUser = await authService.registerUser(username, email, password, role, telefono);
     res.status(201).json(newUser);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -133,9 +133,51 @@ export const verifyToken = async (req, res) => {
     return res.status(401).json({ message: "Token not provided" });
   }
   try {
-    const user = await authService.verifyToken(token);
+    const user = authService.verifyToken(token);
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const verifyActivationToken = async (req, res) => {
+  const { token } = req.params;
+  try {
+    if (!token) {
+      return res.status(400).json({ message: "Token is required" });
+    }
+    const user = authService.verifyActivationToken(token);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json({ message: "User activated successfully", user });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: "El correo es requerido" });
+  }
+
+  try {
+    await authService.forgotPassword(email);
+    res.status(200).json({ message: "Se ha enviado un correo para restablecer la contraseña" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+  if (!token || !newPassword) {
+    return res.status(400).json({ message: "El token y la nueva contraseña son requeridos" });
+  }
+
+  try {
+    await authService.resetPassword(token, newPassword);
+    res.status(200).json({ message: "La contraseña se ha restablecido correctamente" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
