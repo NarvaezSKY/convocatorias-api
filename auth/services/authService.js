@@ -313,7 +313,7 @@ export const authService = {
   },
 
   sendPasswordResetEmail: async (user, token) => {
-    const resetUrl = `${FRONTEND_DEV_URL}/reset-password/${token}`;
+    const resetUrl = `${FRONTEND_PROD_URL}/reset-password/${token}`;
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
