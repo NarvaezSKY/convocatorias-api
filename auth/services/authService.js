@@ -30,7 +30,7 @@ export const authService = {
 
   sendActivationRequestEmail: async (user, token) => {
     const adminEmail = GOOGLE_CLIENT_EMAIL;
-    const activationUrl = `${FRONTEND_DEV_URL}/admin/activate/${token}`;
+    const activationUrl = `${FRONTEND_PROD_URL}/admin/activate/${token}`;
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
