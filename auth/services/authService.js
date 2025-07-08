@@ -286,7 +286,11 @@ export const authService = {
 
     for (const key in filters) {
       if (filters[key]) {
-        query[key] = { $regex: filters[key], $options: "i" };
+        if (key === "estado" || key === "role") {
+          query[key] = { $eq: filters[key] };
+        } else {
+          query[key] = { $regex: filters[key], $options: "i" };
+        }
       }
     }
 
