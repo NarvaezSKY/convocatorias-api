@@ -12,7 +12,7 @@ import {
   GOOGLE_CLIENT_EMAIL,
   GOOGLE_EMAIL_PASSWORD,
   FRONTEND_DEV_URL,
-  FRONTEND_PROD_URL
+  FRONTEND_PROD_URL,
 } from "../../config/token.js";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
@@ -27,13 +27,12 @@ const hashPassword = async (password) => {
 };
 
 export const authService = {
-
   sendActivationRequestEmail: async (user, token) => {
     const adminEmail = GOOGLE_CLIENT_EMAIL;
     const activationUrl = `${FRONTEND_PROD_URL}/admin/activate/${token}`;
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
         user: GOOGLE_CLIENT_EMAIL,
         pass: GOOGLE_EMAIL_PASSWORD,
@@ -43,7 +42,7 @@ export const authService = {
     const mailOptions = {
       from: `"Sistema de Registro" <${GOOGLE_CLIENT_EMAIL}>`,
       to: adminEmail,
-      subject: 'Nueva solicitud de registro',
+      subject: "Nueva solicitud de registro",
       html: `
        
 <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
@@ -160,7 +159,7 @@ export const authService = {
       password: hashedPassword,
       role,
       telefono,
-      estado: "inactivo"
+      estado: "inactivo",
     });
 
     await newUser.save();
@@ -192,7 +191,13 @@ export const authService = {
     return user;
   },
 
-  registerSuperAdmin: async (username, email, password, adminPassword, superAdminPassword) => {
+  registerSuperAdmin: async (
+    username,
+    email,
+    password,
+    adminPassword,
+    superAdminPassword
+  ) => {
     if (adminPassword !== ADMIN_PASSWORD) {
       throw new Error("Invalid admin password");
     }
@@ -233,7 +238,9 @@ export const authService = {
 
     if (user.estado === "inactivo") {
       console.log(user.estado);
-      throw new Error("Tu cuenta está inactiva. Por favor, contacta al administrador.");
+      throw new Error(
+        "Tu cuenta está inactiva. Por favor, contacta al administrador."
+      );
     }
 
     const token = jwt.sign(
@@ -267,9 +274,8 @@ export const authService = {
         token,
         userId: decoded.id,
         role: decoded.role,
-        username: decoded.username
+        username: decoded.username,
       };
-      // eslint-disable-next-line no-unused-vars
     } catch (err) {
       throw new Error("Invalid or expired token");
     }
@@ -297,7 +303,6 @@ export const authService = {
       user.estado = "activo";
       await user.save();
       return user;
-    // eslint-disable-next-line no-unused-vars
     } catch (err) {
       throw new Error("Invalid or expired token");
     }
@@ -316,7 +321,7 @@ export const authService = {
     const resetUrl = `${FRONTEND_PROD_URL}/reset-password/${token}`;
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
         user: GOOGLE_CLIENT_EMAIL,
         pass: GOOGLE_EMAIL_PASSWORD,
@@ -326,7 +331,7 @@ export const authService = {
     const mailOptions = {
       from: `"Sistema de Registro" <${GOOGLE_CLIENT_EMAIL}>`,
       to: user.email,
-      subject: 'Restablecimiento de contraseña',
+      subject: "Restablecimiento de contraseña",
       html: `
 <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
   <table role="presentation" style="width: 100%; border-collapse: collapse;">
@@ -418,11 +423,8 @@ export const authService = {
       user.password = hashedPassword;
       await user.save();
       return user;
-    // eslint-disable-next-line no-unused-vars
     } catch (err) {
       throw new Error("Invalid or expired token");
     }
   },
-
-
 };

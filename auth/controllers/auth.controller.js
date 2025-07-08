@@ -4,11 +4,19 @@ import { authService } from "../services/authService.js";
 export const registerUser = async (req, res) => {
   const { username, email, password, role, telefono } = req.body;
   if (!username || !email || !password || !role || !telefono) {
-    return res.status(400).json({ message: "Username, email and password are required" });
+    return res
+      .status(400)
+      .json({ message: "Username, email and password are required" });
   }
 
   try {
-    const newUser = await authService.registerUser(username, email, password, role, telefono);
+    const newUser = await authService.registerUser(
+      username,
+      email,
+      password,
+      role,
+      telefono
+    );
     res.status(201).json(newUser);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -34,7 +42,8 @@ export const registerAdmin = async (req, res) => {
 };
 
 export const registerSuperAdmin = async (req, res) => {
-  const { username, email, password, adminPassword, superAdminPassword } = req.body;
+  const { username, email, password, adminPassword, superAdminPassword } =
+    req.body;
   try {
     const newUser = await authService.registerSuperAdmin(
       username,
@@ -55,7 +64,9 @@ export const registerSuperAdmin = async (req, res) => {
 export const login = async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
-    return res.status(400).json({ message: "Username and password are required" });
+    return res
+      .status(400)
+      .json({ message: "Username and password are required" });
   }
   try {
     const { token, userId, role } = await authService.login(username, password);
@@ -102,10 +113,7 @@ export const updateRole = async (req, res) => {
   const { userId, newRole } = req.body;
 
   try {
-    const user = await authService.updateProfile(
-      userId,
-      newRole
-    );
+    const user = await authService.updateProfile(userId, newRole);
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -116,10 +124,7 @@ export const updateStatus = async (req, res) => {
   const { userId, newStatus } = req.body;
 
   try {
-    const user = await authService.updateStatus(
-      userId,
-      newStatus
-    );
+    const user = await authService.updateStatus(userId, newStatus);
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -152,7 +157,7 @@ export const verifyActivationToken = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-}
+};
 
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -162,7 +167,9 @@ export const forgotPassword = async (req, res) => {
 
   try {
     await authService.forgotPassword(email);
-    res.status(200).json({ message: "Se ha enviado un correo para restablecer la contraseña" });
+    res.status(200).json({
+      message: "Se ha enviado un correo para restablecer la contraseña",
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -171,13 +178,26 @@ export const forgotPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
   if (!token || !newPassword) {
-    return res.status(400).json({ message: "El token y la nueva contraseña son requeridos" });
+    return res
+      .status(400)
+      .json({ message: "El token y la nueva contraseña son requeridos" });
   }
 
   try {
     await authService.resetPassword(token, newPassword);
-    res.status(200).json({ message: "La contraseña se ha restablecido correctamente" });
+    res
+      .status(200)
+      .json({ message: "La contraseña se ha restablecido correctamente" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-}
+};
+
+export const getFilteredUsers = async (req, res) => {
+  try {
+    const users = await authService.filterUsers(req.query);
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
