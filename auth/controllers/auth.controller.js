@@ -2,7 +2,7 @@ import { authService } from "../services/authService.js";
 
 // Registrar un usuario normal
 export const registerUser = async (req, res) => {
-  const { username, email, password, role, telefono } = req.body;
+  const { username, email, password, role, telefono, areaDeTrabajo, clasificacionMinCiencias, CvLAC, SemilleroInvestigacion } = req.body;
   if (!username || !email || !password || !role || !telefono) {
     return res
       .status(400)
@@ -15,7 +15,11 @@ export const registerUser = async (req, res) => {
       email,
       password,
       role,
-      telefono
+      telefono,
+      areaDeTrabajo,
+      clasificacionMinCiencias,
+      CvLAC,
+      SemilleroInvestigacion
     );
     res.status(201).json(newUser);
   } catch (err) {

@@ -140,7 +140,7 @@ export const authService = {
     await transporter.sendMail(mailOptions);
   },
 
-  registerUser: async (username, email, password, role, telefono) => {
+  registerUser: async (username, email, password, role, telefono, areaDeTrabajo, clasificacionMinCiencias, CvLAC, SemilleroInvestigacion) => {
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       throw new Error("Username already exists");
@@ -160,6 +160,10 @@ export const authService = {
       role,
       telefono,
       estado: "inactivo",
+      areaDeTrabajo,
+      clasificacionMinCiencias,
+      CvLAC,
+      SemilleroInvestigacion
     });
 
     await newUser.save();

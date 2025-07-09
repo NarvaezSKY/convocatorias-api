@@ -20,7 +20,6 @@ const userSchema = new mongoose.Schema(
     estado: { type: String, enum: ["activo", "inactivo"], default: "inactivo" },
 
     //Dinamizador - Investigador fields
-    correoInstitucional: { type: String, maxlength: 50, default: "" },
     areaDeTrabajo: { type: String, maxlength: 50, default: "" },
     clasificacionMinCiencias: { type: String, maxlength: 50, default: "" },
     CvLAC: { type: String, maxlength: 50, default: "" },
