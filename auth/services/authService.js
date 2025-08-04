@@ -142,9 +142,6 @@ export const authService = {
 
   registerUser: async (username, email, password, role, telefono, areaDeTrabajo, clasificacionMinCiencias, CvLAC, SemilleroInvestigacion) => {
     const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      throw new Error("Username already exists");
-    }
 
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
@@ -234,8 +231,8 @@ export const authService = {
     return newUser;
   },
 
-  login: async (username, password) => {
-    const user = await User.findOne({ username });
+  login: async (email, password) => {
+    const user = await User.findOne({ email });
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new Error("Credenciales incorrectas");
     }
@@ -261,8 +258,8 @@ export const authService = {
     return users;
   },
 
-  getSingleUser: async (username) => {
-    const user = await User.findOne({ username });
+  getSingleUser: async (_id) => {
+    const user = await User.findOne({ _id });
     return user;
   },
 

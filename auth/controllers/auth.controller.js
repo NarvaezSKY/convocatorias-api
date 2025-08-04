@@ -6,7 +6,7 @@ export const registerUser = async (req, res) => {
   if (!username || !email || !password || !role || !telefono) {
     return res
       .status(400)
-      .json({ message: "Username, email and password are required" });
+      .json({ message: "Nombre de usuario, correo, contraseña y rol son requeridos" });
   }
 
   try {
@@ -66,14 +66,14 @@ export const registerSuperAdmin = async (req, res) => {
 
 // Login
 export const login = async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
+  const { email, password } = req.body;
+  if (!email || !password) {
     return res
       .status(400)
-      .json({ message: "Username and password are required" });
+      .json({ message: "Correo y contraseña son requeridos" });
   }
   try {
-    const { token, userId, role } = await authService.login(username, password);
+    const { token, userId, role, username } = await authService.login(email, password);
     res.status(200).json({ token, userId, role, username });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -92,10 +92,10 @@ export const getUsers = async (req, res) => {
 
 // Obtener un usuario específico por username
 export const getSingleUser = async (req, res) => {
-  const { username } = req.params;
+  const { id } = req.params;
   try {
-    const user = await authService.getSingleUser(username);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const user = await authService.getSingleUser(id);
+    if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });

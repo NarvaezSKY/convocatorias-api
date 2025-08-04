@@ -35,9 +35,8 @@ router.get(
   getUsers
 );
 router.get(
-  "/user/:username",
+  "/user/:id",
   verifyToken,
-  verifyRole(SUPER_ADMIN_ROLE),
   getSingleUser
 );
 router.get("/profile", verifyToken, profile);
