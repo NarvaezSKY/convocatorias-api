@@ -432,4 +432,14 @@ export const authService = {
       throw new Error("Invalid or expired token");
     }
   },
+
+  updateUser: async (userId, updates) => {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error("No se encontró al usuario");
+    }
+    Object.assign(user, updates);
+    await user.save();
+    return user;
+  },
 };

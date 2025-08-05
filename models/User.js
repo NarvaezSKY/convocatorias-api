@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema(
         "admin",
         "superadmin",
         "Linvestigador",
+        "aprendiz"
       ],
       default: "investigador",
     },
@@ -24,6 +25,7 @@ const userSchema = new mongoose.Schema(
     clasificacionMinCiencias: { type: String, maxlength: 200, default: "" },
     CvLAC: { type: String, maxlength: 200, default: "" },
     SemilleroInvestigacion: { type: String, maxlength: 200, default: "" },
+    enlaceDeProductos: { type: String, maxlength: 200, default: "" },
   },
   { timestamps: true }
 );

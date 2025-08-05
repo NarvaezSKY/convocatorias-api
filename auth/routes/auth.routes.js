@@ -12,6 +12,7 @@ import {
   resetPassword,
   updateStatus,
   getFilteredUsers,
+  updateUser,
 } from "../controllers/auth.controller.js";
 import { verifyRole } from "../../shared/middlewares/verifyRole.js";
 import { verifyToken } from "../../shared/middlewares/verifyToken.js";
@@ -70,6 +71,12 @@ router.get(
   verifyToken,
   verifyRole([SUPER_ADMIN_ROLE, DINAMIZADOR_ROLE, LINVESTIGADOR_ROLE]),
   getFilteredUsers
+);
+
+router.patch(
+  "/update-user",
+  verifyToken,
+  updateUser
 );
 
 export default router;

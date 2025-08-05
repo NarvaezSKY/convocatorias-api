@@ -205,3 +205,13 @@ export const getFilteredUsers = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const updateUser = async (req, res) => {
+  try {
+    const { id, ...updates } = req.body;
+    const updatedUser = await authService.updateUser(id, updates);
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
