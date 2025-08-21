@@ -71,7 +71,7 @@ export const authService = {
                                     El usuario <strong style="color: #333333;">${user.username}</strong> (${user.email}, ${user.telefono}, ${user.role}) solicita activar su cuenta.
                                 </p>                                
                                 <p style="color: #555555; font-size: 16px; line-height: 1.6; margin: 0;">
-                                    Haz clic en el siguiente botón para activarlo:
+                                    Haz clic en el siguiente botón para activarlo (RECUERDA HABER INCIADO SESIÓN PREVIO LA ACTIVACIÓN DEL USUARIO):
                                 </p>
                             </div>
                             
