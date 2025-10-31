@@ -16,10 +16,14 @@ export const createConvocatoria = async (data, userId) => {
   const valorAprobado = parseFloat(data.valor_aprobado) || 0;
   const diferenciaPresupuesto = valorSolicitado - valorAprobado;
 
+  // Si no se proporciona el año, usar el año actual
+  const year = data.year || new Date().getFullYear();
+
   const nuevaConvocatoria = new Convocatoria({
     ...data,
     user_id: userId,
     diferencia_presupuesto: diferenciaPresupuesto,
+    year: year,
   });
 
   const result = await nuevaConvocatoria.save();
@@ -37,6 +41,11 @@ export const updateConvocatoria = async (id, data) => {
   const valorSolicitado = parseFloat(convocatoria.valor_solicitado) || 0;
   const valorAprobado = parseFloat(convocatoria.valor_aprobado) || 0;
   convocatoria.diferencia_presupuesto = valorSolicitado - valorAprobado;
+
+  // Si se proporciona el año en los datos, actualizarlo
+  if (data.year) {
+    convocatoria.year = data.year;
+  }
 
   await updateConvocatoriaInSheet(convocatoria);
 
@@ -60,7 +69,12 @@ export const filterConvocatorias = async (filters) => {
 
   for (const key in filters) {
     if (filters[key]) {
-      query[key] = { $regex: filters[key], $options: "i" };
+      // Para el campo year, usar coincidencia exacta en lugar de regex
+      if (key === 'year') {
+        query[key] = parseInt(filters[key]);
+      } else {
+        query[key] = { $regex: filters[key], $options: "i" };
+      }
     }
   }
 
@@ -128,4 +142,15 @@ export const getConvocatoriaById = async (id) => {
   const convocatoria = await Convocatoria.findById(id).populate("user_id");
   if (!convocatoria) throw new Error("Convocatoria not found");
   return convocatoria;
+};
+
+// Nueva función para obtener convocatorias por año
+export const getConvocatoriasByYear = async (year) => {
+  return await Convocatoria.find({ year: parseInt(year) }).populate("user_id");
+};
+
+// Nueva función para obtener todos los años disponibles
+export const getAvailableYears = async () => {
+  const years = await Convocatoria.distinct("year");
+  return years.sort((a, b) => b - a); // Ordenar de manera descendente
 };

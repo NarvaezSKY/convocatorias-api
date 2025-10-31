@@ -25,6 +25,7 @@ export const addConvocatoriaToSheet = async (convocatoria) => {
                 convocatoria.valor_solicitado,
                 convocatoria.valor_aprobado,
                 convocatoria.diferencia_presupuesto,
+                convocatoria.year,
             ]]
         }
     });
@@ -74,6 +75,7 @@ export const updateConvocatoriaInSheet = async (convocatoria) => {
                 convocatoria.valor_solicitado,
                 convocatoria.valor_aprobado,
                 convocatoria.diferencia_presupuesto,
+                convocatoria.year,
             ]]
         }
     });

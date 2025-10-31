@@ -5,7 +5,9 @@ import {
   updateConvocatoriaController,
   deleteConvocatoriaController,
   filterConvocatoriasController,
-  getConvocatoriaByIdController,  
+  getConvocatoriaByIdController,
+  getConvocatoriasByYearController,
+  getAvailableYearsController,
 } from "../controllers/convocatoria.controller.js";
 import { verifyToken } from "../../shared/middlewares/verifyToken.js";
 import { verifyRole } from "../../shared/middlewares/verifyRole.js";
@@ -39,6 +41,20 @@ router.get(
   verifyToken,
   verifyRole([SUPER_ADMIN_ROLE, ADMIN_ROLE, DINAMIZADOR_ROLE, USER_ROLE, LINVESTIGADOR_ROLE]),
   getConvocatoriaByIdController
+);
+
+// Nueva ruta para obtener convocatorias por año
+router.get(
+  "/year/:year",
+  verifyToken,
+  getConvocatoriasByYearController
+);
+
+// Nueva ruta para obtener años disponibles
+router.get(
+  "/years/available",
+  verifyToken,
+  getAvailableYearsController
 );
 
 export default router;
