@@ -8,6 +8,8 @@ import {
   generateConvocatoriasReport,
   getConvocatoriasByYear,
   getAvailableYears,
+  addUserToConvocatoria,
+  removeUserFromConvocatoria,
 } from "../services/convocatoria.service.js";
 
 export const getConvocatoriasController = async (req, res) => {
@@ -143,3 +145,34 @@ export const getAvailableYearsController = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Agregar usuario a proyecto (convocatoria)
+export const addUserToConvocatoriaController = async (req, res) => {
+  try {
+    const { id } = req.params; // id de convocatoria
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+    const updated = await addUserToConvocatoria(id, userId);
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Remover usuario de proyecto (convocatoria)
+export const removeUserFromConvocatoriaController = async (req, res) => {
+  try {
+    const { id } = req.params; // id de convocatoria
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+    const updated = await removeUserFromConvocatoria(id, userId);
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

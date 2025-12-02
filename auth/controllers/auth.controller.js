@@ -2,7 +2,7 @@ import { authService } from "../services/authService.js";
 
 // Registrar un usuario normal
 export const registerUser = async (req, res) => {
-  const { username, email, password, role, telefono, areaDeTrabajo, clasificacionMinCiencias, CvLAC, SemilleroInvestigacion } = req.body;
+  const { username, email, password, role, telefono, areaDeTrabajo, clasificacionMinCiencias, CvLAC, SemilleroInvestigacion, SENAemail, centroDeFormacion } = req.body;
   if (!username || !email || !password || !role || !telefono) {
     return res
       .status(400)
@@ -19,7 +19,9 @@ export const registerUser = async (req, res) => {
       areaDeTrabajo,
       clasificacionMinCiencias,
       CvLAC,
-      SemilleroInvestigacion
+      SemilleroInvestigacion,
+      SENAemail,
+      centroDeFormacion
     );
     res.status(201).json(newUser);
   } catch (err) {
@@ -66,14 +68,14 @@ export const registerSuperAdmin = async (req, res) => {
 
 // Login
 export const login = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
+  const { SENAemail, password } = req.body;
+  if (!SENAemail || !password) {
     return res
       .status(400)
       .json({ message: "Correo y contraseña son requeridos" });
   }
   try {
-    const { token, userId, role, username } = await authService.login(email, password);
+    const { token, userId, role, username } = await authService.login(SENAemail, password);
     res.status(200).json({ token, userId, role, username });
   } catch (err) {
     res.status(400).json({ message: err.message });

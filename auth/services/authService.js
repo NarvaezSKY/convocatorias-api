@@ -140,8 +140,8 @@ export const authService = {
     await transporter.sendMail(mailOptions);
   },
 
-  registerUser: async (username, email, password, role, telefono, areaDeTrabajo, clasificacionMinCiencias, CvLAC, SemilleroInvestigacion) => {
-    const existingUser = await User.findOne({ username });
+  registerUser: async (username, email, password, role, telefono, areaDeTrabajo, clasificacionMinCiencias, CvLAC, SemilleroInvestigacion, SENAemail, centroDeFormacion) => {
+    // const existingUser = await User.findOne({ username });
 
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
@@ -160,7 +160,9 @@ export const authService = {
       areaDeTrabajo,
       clasificacionMinCiencias,
       CvLAC,
-      SemilleroInvestigacion
+      SemilleroInvestigacion,
+      SENAemail,
+      centroDeFormacion,
     });
 
     await newUser.save();
@@ -231,8 +233,8 @@ export const authService = {
     return newUser;
   },
 
-  login: async (email, password) => {
-    const user = await User.findOne({ email });
+  login: async (SENAemail, password) => {
+    const user = await User.findOne({ SENAemail });
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new Error("Credenciales incorrectas");
     }

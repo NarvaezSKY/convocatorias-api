@@ -8,6 +8,8 @@ import {
   getConvocatoriaByIdController,
   getConvocatoriasByYearController,
   getAvailableYearsController,
+  addUserToConvocatoriaController,
+  removeUserFromConvocatoriaController,
 } from "../controllers/convocatoria.controller.js";
 import { verifyToken } from "../../shared/middlewares/verifyToken.js";
 import { verifyRole } from "../../shared/middlewares/verifyRole.js";
@@ -56,5 +58,19 @@ router.get(
   verifyToken,
   getAvailableYearsController
 );
+router.post(
+  "/:id/users/add",
+  verifyToken,
+  verifyRole([SUPER_ADMIN_ROLE, ADMIN_ROLE, DINAMIZADOR_ROLE, USER_ROLE, LINVESTIGADOR_ROLE]),
+  addUserToConvocatoriaController
+);
+
+router.post(
+  "/:id/users/remove",
+  verifyToken,
+  verifyRole([SUPER_ADMIN_ROLE, ADMIN_ROLE, DINAMIZADOR_ROLE, USER_ROLE, LINVESTIGADOR_ROLE]),
+  removeUserFromConvocatoriaController
+);
+
 
 export default router;

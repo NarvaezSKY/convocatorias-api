@@ -17,6 +17,7 @@ const convocatoriaSchema = new mongoose.Schema({
   valor_aprobado: { type: Number },
   diferencia_presupuesto: { type: Number },
   year: { type: Number, required: true },
+  users: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 }, { timestamps: false });
 
 export const Convocatoria = mongoose.model('Convocatoria', convocatoriaSchema);

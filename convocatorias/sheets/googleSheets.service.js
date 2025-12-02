@@ -2,6 +2,13 @@ import { googleSheetsClient } from '../../libs/google/googleSheetsAPIClient.plug
 import { SPREAD_SHEET_ID, SHEET_NAME } from '../../config/token.js';
 
 export const addConvocatoriaToSheet = async (convocatoria) => {
+    // Asegurar que user_id sea un string y no un objeto completo
+    const userIdValue = convocatoria.user_id && typeof convocatoria.user_id === 'object'
+        ? (convocatoria.user_id._id?.toString() || '')
+        : (convocatoria.user_id ? convocatoria.user_id.toString() : '');
+
+    // Opcional: contar usuarios asociados (array many-to-many)
+    const usersCount = Array.isArray(convocatoria.users) ? convocatoria.users.length : 0;
 
     await googleSheetsClient.spreadsheets.values.append({
         spreadsheetId: SPREAD_SHEET_ID,
@@ -20,12 +27,13 @@ export const addConvocatoriaToSheet = async (convocatoria) => {
                 convocatoria.fecha_inicio,
                 convocatoria.fecha_fin,
                 convocatoria.observaciones,
-                convocatoria.user_id,
+                userIdValue,
                 convocatoria.url,
                 convocatoria.valor_solicitado,
                 convocatoria.valor_aprobado,
                 convocatoria.diferencia_presupuesto,
                 convocatoria.year,
+                usersCount, // nueva columna con número de usuarios vinculados
             ]]
         }
     });
@@ -52,6 +60,11 @@ export const updateConvocatoriaInSheet = async (convocatoria) => {
 
     if (rowIndex === -1) return;
 
+    const userIdValue = convocatoria.user_id && typeof convocatoria.user_id === 'object'
+        ? (convocatoria.user_id._id?.toString() || '')
+        : (convocatoria.user_id ? convocatoria.user_id.toString() : '');
+    const usersCount = Array.isArray(convocatoria.users) ? convocatoria.users.length : 0;
+
     const range = `${SHEET_NAME}!A${rowIndex + 2}`;
     await googleSheetsClient.spreadsheets.values.update({
         spreadsheetId: SPREAD_SHEET_ID,
@@ -70,12 +83,13 @@ export const updateConvocatoriaInSheet = async (convocatoria) => {
                 convocatoria.fecha_inicio,
                 convocatoria.fecha_fin,
                 convocatoria.observaciones,
-                convocatoria.user_id,
+                userIdValue,
                 convocatoria.url,
                 convocatoria.valor_solicitado,
                 convocatoria.valor_aprobado,
                 convocatoria.diferencia_presupuesto,
                 convocatoria.year,
+                usersCount,
             ]]
         }
     });

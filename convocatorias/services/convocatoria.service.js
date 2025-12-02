@@ -1,4 +1,5 @@
 import ExcelJS from "exceljs";
+import mongoose from "mongoose";
 import { Convocatoria } from "../../models/Convocatoria.js";
 import { PlanFinanciero } from "../../models/PlanFinanciero.js";
 import {
@@ -67,18 +68,39 @@ export const deleteConvocatoria = async (id) => {
 export const filterConvocatorias = async (filters) => {
   const query = {};
 
-  for (const key in filters) {
-    if (filters[key]) {
-      // Para el campo year, usar coincidencia exacta en lugar de regex
-      if (key === 'year') {
-        query[key] = parseInt(filters[key]);
-      } else {
-        query[key] = { $regex: filters[key], $options: "i" };
-      }
-    }
+  // Normalizar claves provenientes de querystring (users[] vs users)
+  const normalized = { ...filters };
+  if (normalized['users[]'] && !normalized.users) {
+    normalized.users = normalized['users[]'];
   }
 
-  return await Convocatoria.find(query).populate("user_id");
+  for (const key in normalized) {
+    const value = normalized[key];
+    if (!value) continue;
+
+    if (key === 'year') {
+      query.year = parseInt(value);
+      continue;
+    }
+
+    if (key === 'users') {
+      // Puede venir como string único o arreglo
+      const ids = Array.isArray(value) ? value : [value];
+      // Filtrar ids válidos y convertirlos a ObjectId
+      const objectIds = ids
+        .filter(v => mongoose.Types.ObjectId.isValid(v))
+        .map(v => new mongoose.Types.ObjectId(v));
+      if (objectIds.length > 0) {
+        query.users = { $in: objectIds }; // pertenencia en el array
+      }
+      continue;
+    }
+
+    // Campos de texto: búsqueda parcial insensible a mayúsculas
+    query[key] = { $regex: value, $options: 'i' };
+  }
+
+  return await Convocatoria.find(query).populate('user_id');
 };
 
 export const generateConvocatoriasReport = async (data) => {
@@ -153,4 +175,42 @@ export const getConvocatoriasByYear = async (year) => {
 export const getAvailableYears = async () => {
   const years = await Convocatoria.distinct("year");
   return years.sort((a, b) => b - a); // Ordenar de manera descendente
+};
+
+// Agregar un usuario al array `users` evitando duplicados
+export const addUserToConvocatoria = async (convocatoriaId, userId) => {
+  // Asegurar tipo ObjectId
+  const objectUserId = mongoose.Types.ObjectId.isValid(userId)
+    ? new mongoose.Types.ObjectId(userId)
+    : null;
+  if (!objectUserId) throw new Error("Invalid userId");
+  const updated = await Convocatoria.findByIdAndUpdate(
+    convocatoriaId,
+    { $addToSet: { users: objectUserId } },
+    { new: true }
+  ).populate("user_id");
+  if (!updated) throw new Error("Convocatoria not found");
+  await updateConvocatoriaInSheet(updated);
+  return updated;
+};
+
+// Remover un usuario del array `users`
+export const removeUserFromConvocatoria = async (convocatoriaId, userId) => {
+  const objectUserId = mongoose.Types.ObjectId.isValid(userId)
+    ? new mongoose.Types.ObjectId(userId)
+    : null;
+  if (!objectUserId) throw new Error("Invalid userId");
+  const updated = await Convocatoria.findByIdAndUpdate(
+    convocatoriaId,
+    { $pull: { users: objectUserId } },
+    { new: true }
+  ).populate("user_id");
+  if (!updated) throw new Error("Convocatoria not found");
+  await updateConvocatoriaInSheet(updated);
+  return updated;
+};
+
+// Obtener convocatorias por id de usuario (muchos a muchos)
+export const getConvocatoriasByUserId = async (userId) => {
+  return await Convocatoria.find({ users: userId }).populate("user_id");
 };

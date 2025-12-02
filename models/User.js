@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema(
   {
     username: { type: String, required: true, maxlength: 50 },
-    email: { type: String, required: true, unique: true, maxlength: 50 },
+    email: { type: String, unique: true, maxlength: 50 },
     password: { type: String, required: true },
     role: {
       type: String,
@@ -19,13 +19,14 @@ const userSchema = new mongoose.Schema(
     },
     telefono: { type: String, maxlength: 15, default: "" },
     estado: { type: String, enum: ["activo", "inactivo"], default: "inactivo" },
+    SENAemail: { type: String, maxlength: 50, default: "", unique: true, required: true },
 
     //Dinamizador - Investigador fields
     areaDeTrabajo: { type: String, maxlength: 200, default: "" },
     clasificacionMinCiencias: { type: String, maxlength: 200, default: "" },
     CvLAC: { type: String, maxlength: 200, default: "" },
     SemilleroInvestigacion: { type: String, maxlength: 200, default: "" },
-    enlaceDeProductos: { type: String, maxlength: 200, default: "" },
+    centroDeFormacion: { type: String, maxlength: 100, default: "" },
   },
   { timestamps: true }
 );
