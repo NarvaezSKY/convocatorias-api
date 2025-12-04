@@ -61,14 +61,14 @@ router.get(
 router.post(
   "/:id/users/add",
   verifyToken,
-  verifyRole([SUPER_ADMIN_ROLE, ADMIN_ROLE, DINAMIZADOR_ROLE, USER_ROLE, LINVESTIGADOR_ROLE]),
+  verifyRole([SUPER_ADMIN_ROLE, ADMIN_ROLE, DINAMIZADOR_ROLE, USER_ROLE, COORDINADOR_ROLE]),
   addUserToConvocatoriaController
 );
 
 router.post(
   "/:id/users/remove",
   verifyToken,
-  verifyRole([SUPER_ADMIN_ROLE, ADMIN_ROLE, DINAMIZADOR_ROLE, USER_ROLE, LINVESTIGADOR_ROLE]),
+  verifyRole([SUPER_ADMIN_ROLE, ADMIN_ROLE, DINAMIZADOR_ROLE, USER_ROLE, COORDINADOR_ROLE]),
   removeUserFromConvocatoriaController
 );
 
