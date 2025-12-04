@@ -20,6 +20,7 @@ import {
   SUPER_ADMIN_ROLE,
   DINAMIZADOR_ROLE,
   LINVESTIGADOR_ROLE,
+  COORDINADOR_ROLE,
 } from "../../config/token.js";
 
 const router = express.Router();
@@ -32,7 +33,7 @@ router.post("/login", login);
 router.get(
   "/users",
   verifyToken,
-  verifyRole([SUPER_ADMIN_ROLE, DINAMIZADOR_ROLE, LINVESTIGADOR_ROLE]),
+  verifyRole([SUPER_ADMIN_ROLE, DINAMIZADOR_ROLE, LINVESTIGADOR_ROLE, COORDINADOR_ROLE]),
   getUsers
 );
 router.get(
@@ -69,7 +70,7 @@ router.patch(
 router.get(
   "/filter-users",
   verifyToken,
-  verifyRole([SUPER_ADMIN_ROLE, DINAMIZADOR_ROLE, LINVESTIGADOR_ROLE]),
+  verifyRole([SUPER_ADMIN_ROLE, DINAMIZADOR_ROLE, LINVESTIGADOR_ROLE, COORDINADOR_ROLE]),
   getFilteredUsers
 );
 
