@@ -12,6 +12,7 @@ const corsOptions = {
     "http://localhost:5173",
     "http://localhost:4173",
     "https://seguimiento-innovacion-y-competitividad.vercel.app",
+    "https://seguimiento-innovacion-y-competitividad-dn9h5ihxj.vercel.app/"
   ],
   optionsSuccessStatus: 200,
   credentials: true,
