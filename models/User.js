@@ -13,7 +13,8 @@ const userSchema = new mongoose.Schema(
         "admin",
         "superadmin",
         "Linvestigador",
-        "aprendiz"
+        "aprendiz",
+        "coordinador"
       ],
       default: "investigador",
     },
