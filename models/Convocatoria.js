@@ -18,6 +18,13 @@ const convocatoriaSchema = new mongoose.Schema({
   diferencia_presupuesto: { type: Number },
   year: { type: Number, required: true },
   users: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
+  //Poblacion objetivo fields
+  departamentosDeImpacto: [{ type: String, maxlength: 1000, required: false }],
+  municipiosDeImpacto: [{ type: String, maxlength: 1000, required: false }],
+  tiposPoblacionesAtendidas: [{ type: String, maxlength: 1000, required: false }],
+  numeroBeneficiariosDirectos: { type: Number, required: false },
+  numeroBeneficiariosIndirectos: { type: Number, required: false },
 }, { timestamps: false });
 
 export const Convocatoria = mongoose.model('Convocatoria', convocatoriaSchema);

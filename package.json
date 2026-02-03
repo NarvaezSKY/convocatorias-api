@@ -19,7 +19,8 @@
     "dev": "nodemon index.js",
     "syntax-check": "node --check index.js",
     "lint": "eslint . --ext .js",
-    "check": "yarn syntax-check && yarn lint"
+    "check": "yarn syntax-check && yarn lint",
+    "sync-users": "node scripts/syncExistingUsersToSheet.js"
   },
   "type": "module",
   "name": "jwt-authentication",

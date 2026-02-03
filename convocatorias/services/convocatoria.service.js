@@ -96,6 +96,17 @@ export const filterConvocatorias = async (filters) => {
       continue;
     }
 
+    // Campos de arrays de población objetivo
+    if (key === 'departamentosDeImpacto' || key === 'municipiosDeImpacto' || key === 'tiposPoblacionesAtendidas') {
+      // Dividir por comas y limpiar espacios
+      const valores = value.split(',').map(v => v.trim()).filter(v => v);
+      if (valores.length > 0) {
+        // Buscar que el array contenga al menos uno de los valores
+        query[key] = { $in: valores };
+      }
+      continue;
+    }
+
     // Campos de texto: búsqueda parcial insensible a mayúsculas
     query[key] = { $regex: value, $options: 'i' };
   }

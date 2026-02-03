@@ -18,6 +18,7 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import { generateActivationToken } from "../../utils/generateActivationToken.js";
 import { verifyActivationToken as activateUser } from "../../utils/generateActivationToken.js";
+import { addUserToSheet, updateUserInSheet } from "../sheets/googleSheetsUsers.service.js";
 
 dotenv.config();
 
@@ -170,6 +171,16 @@ export const authService = {
     const token = generateActivationToken(newUser._id.toString());
 
     await authService.sendActivationRequestEmail(newUser, token);
+    
+    // Sincronizar con Google Sheets
+    try {
+      console.log('📊 Iniciando sincronización con Google Sheets (registro)...');
+      await addUserToSheet(newUser);
+      console.log('✅ Sincronización completada (registro)');
+    } catch (error) {
+      console.error('❌ Error al añadir usuario a Google Sheets (registro):', error.message);
+      console.error(error);
+    }
 
     return newUser;
   },
@@ -179,8 +190,20 @@ export const authService = {
     if (!user) {
       throw new Error("User not found");
     }
+    console.log('🔄 Actualizando rol de usuario:', userId, 'nuevo rol:', newRole);
     user.role = newRole;
     await user.save();
+    
+    // Sincronizar con Google Sheets
+    try {
+      console.log('📊 Iniciando sincronización con Google Sheets (updateProfile)...');
+      await updateUserInSheet(user);
+      console.log('✅ Sincronización completada (updateProfile)');
+    } catch (error) {
+      console.error('❌ Error al actualizar usuario en Google Sheets (updateProfile):', error.message);
+      console.error(error);
+    }
+    
     return user;
   },
 
@@ -189,8 +212,20 @@ export const authService = {
     if (!user) {
       throw new Error("User not found");
     }
+    console.log('🔄 Actualizando estado de usuario:', userId, 'nuevo estado:', newStatus);
     user.estado = newStatus;
     await user.save();
+    
+    // Sincronizar con Google Sheets
+    try {
+      console.log('📊 Iniciando sincronización con Google Sheets (updateStatus)...');
+      await updateUserInSheet(user);
+      console.log('✅ Sincronización completada (updateStatus)');
+    } catch (error) {
+      console.error('❌ Error al actualizar usuario en Google Sheets (updateStatus):', error.message);
+      console.error(error);
+    }
+    
     return user;
   },
 
@@ -307,8 +342,20 @@ export const authService = {
       if (!user) {
         throw new Error("User not found");
       }
+      console.log('🔄 Activando usuario:', decoded.userId);
       user.estado = "activo";
       await user.save();
+      
+      // Sincronizar con Google Sheets
+      try {
+        console.log('📊 Iniciando sincronización con Google Sheets (activación)...');
+        await updateUserInSheet(user);
+        console.log('✅ Sincronización completada (activación)');
+      } catch (error) {
+        console.error('❌ Error al actualizar usuario en Google Sheets (activación):', error.message);
+        console.error(error);
+      }
+      
       return user;
     } catch (err) {
       throw new Error("Invalid or expired token");
@@ -440,8 +487,20 @@ export const authService = {
     if (!user) {
       throw new Error("No se encontró al usuario");
     }
+    console.log('🔄 Actualizando usuario:', userId, 'campos:', Object.keys(updates));
     Object.assign(user, updates);
     await user.save();
+    
+    // Sincronizar con Google Sheets
+    try {
+      console.log('📊 Iniciando sincronización con Google Sheets (updateUser)...');
+      await updateUserInSheet(user);
+      console.log('✅ Sincronización completada (updateUser)');
+    } catch (error) {
+      console.error('❌ Error al actualizar usuario en Google Sheets (updateUser):', error.message);
+      console.error(error);
+    }
+    
     return user;
   },
 };

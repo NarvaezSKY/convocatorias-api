@@ -10,6 +10,17 @@ export const addConvocatoriaToSheet = async (convocatoria) => {
     // Opcional: contar usuarios asociados (array many-to-many)
     const usersCount = Array.isArray(convocatoria.users) ? convocatoria.users.length : 0;
 
+    // Convertir arrays de población objetivo a strings
+    const departamentosDeImpacto = Array.isArray(convocatoria.departamentosDeImpacto) 
+        ? convocatoria.departamentosDeImpacto.join(', ') 
+        : (convocatoria.departamentosDeImpacto || '');
+    const municipiosDeImpacto = Array.isArray(convocatoria.municipiosDeImpacto) 
+        ? convocatoria.municipiosDeImpacto.join(', ') 
+        : (convocatoria.municipiosDeImpacto || '');
+    const tiposPoblacionesAtendidas = Array.isArray(convocatoria.tiposPoblacionesAtendidas) 
+        ? convocatoria.tiposPoblacionesAtendidas.join(', ') 
+        : (convocatoria.tiposPoblacionesAtendidas || '');
+
     await googleSheetsClient.spreadsheets.values.append({
         spreadsheetId: SPREAD_SHEET_ID,
         range: `${SHEET_NAME}!A1`,
@@ -34,6 +45,11 @@ export const addConvocatoriaToSheet = async (convocatoria) => {
                 convocatoria.diferencia_presupuesto,
                 convocatoria.year,
                 usersCount, // nueva columna con número de usuarios vinculados
+                departamentosDeImpacto,
+                municipiosDeImpacto,
+                tiposPoblacionesAtendidas,
+                convocatoria.numeroBeneficiariosDirectos || '',
+                convocatoria.numeroBeneficiariosIndirectos || '',
             ]]
         }
     });
@@ -65,6 +81,17 @@ export const updateConvocatoriaInSheet = async (convocatoria) => {
         : (convocatoria.user_id ? convocatoria.user_id.toString() : '');
     const usersCount = Array.isArray(convocatoria.users) ? convocatoria.users.length : 0;
 
+    // Convertir arrays de población objetivo a strings
+    const departamentosDeImpacto = Array.isArray(convocatoria.departamentosDeImpacto) 
+        ? convocatoria.departamentosDeImpacto.join(', ') 
+        : (convocatoria.departamentosDeImpacto || '');
+    const municipiosDeImpacto = Array.isArray(convocatoria.municipiosDeImpacto) 
+        ? convocatoria.municipiosDeImpacto.join(', ') 
+        : (convocatoria.municipiosDeImpacto || '');
+    const tiposPoblacionesAtendidas = Array.isArray(convocatoria.tiposPoblacionesAtendidas) 
+        ? convocatoria.tiposPoblacionesAtendidas.join(', ') 
+        : (convocatoria.tiposPoblacionesAtendidas || '');
+
     const range = `${SHEET_NAME}!A${rowIndex + 2}`;
     await googleSheetsClient.spreadsheets.values.update({
         spreadsheetId: SPREAD_SHEET_ID,
@@ -90,6 +117,11 @@ export const updateConvocatoriaInSheet = async (convocatoria) => {
                 convocatoria.diferencia_presupuesto,
                 convocatoria.year,
                 usersCount,
+                departamentosDeImpacto,
+                municipiosDeImpacto,
+                tiposPoblacionesAtendidas,
+                convocatoria.numeroBeneficiariosDirectos || '',
+                convocatoria.numeroBeneficiariosIndirectos || '',
             ]]
         }
     });

@@ -1,18 +1,18 @@
 import express from "express";
 import cors from "cors";
-import authRouter from "./auth/routes/auth.routes.js";
-import convocatoriasRouter from "./convocatorias/routes/convocatoria.routes.js";
-import planFinancieroRouter from './planFinanciero/routes/pF.routes.js';
 import morgan from "morgan";
+import authRouter from "./auth/routes/auth.routes.js";
+import planFinancieroRouter from './planFinanciero/routes/pF.routes.js';
+import convocatoriasRouter from "./convocatorias/routes/convocatoria.routes.js";
+import { FRONTEND_DEV_URL, FRONTEND_PROD_URL, FRONTEND_STG_URL } from "./config/token.js";
 
 const app = express();
 
 const corsOptions = {
   origin: [
-    "http://localhost:5173",
-    "http://localhost:4173",
-    "https://seguimiento-innovacion-y-competitividad.vercel.app",
-    "https://seguimiento-innovacion-y-competitividad-dn9h5ihxj.vercel.app/"
+    FRONTEND_DEV_URL,
+    FRONTEND_STG_URL,
+    FRONTEND_PROD_URL
   ],
   optionsSuccessStatus: 200,
   credentials: true,
