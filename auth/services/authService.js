@@ -363,7 +363,9 @@ export const authService = {
   },
 
   forgotPassword: async (email) => {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      $or: [{ SENAemail: email }, { email }],
+    });
     if (!user) {
       throw new Error("User not found");
     }
@@ -373,6 +375,10 @@ export const authService = {
 
   sendPasswordResetEmail: async (user, token) => {
     const resetUrl = `${FRONTEND_PROD_URL}/reset-password/${token}`;
+    const recipientEmail = user.SENAemail || user.email;
+    if (!recipientEmail) {
+      throw new Error("No se encontró un correo válido para el usuario");
+    }
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -384,7 +390,7 @@ export const authService = {
 
     const mailOptions = {
       from: `"Sistema de Registro" <${GOOGLE_CLIENT_EMAIL}>`,
-      to: user.email,
+      to: recipientEmail,
       subject: "Restablecimiento de contraseña",
       html: `
 <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
