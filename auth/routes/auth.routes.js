@@ -13,6 +13,7 @@ import {
   updateStatus,
   getFilteredUsers,
   updateUser,
+  changePasswordWithSession
 } from "../controllers/auth.controller.js";
 import { verifyRole } from "../../shared/middlewares/verifyRole.js";
 import { verifyToken } from "../../shared/middlewares/verifyToken.js";
@@ -78,6 +79,12 @@ router.patch(
   "/update-user",
   verifyToken,
   updateUser
+);
+
+router.patch(
+  "/change-password-session",
+  verifyToken,
+  changePasswordWithSession
 );
 
 export default router;

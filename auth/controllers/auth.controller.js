@@ -2,11 +2,23 @@ import { authService } from "../services/authService.js";
 
 // Registrar un usuario normal
 export const registerUser = async (req, res) => {
-  const { username, email, password, role, telefono, areaDeTrabajo, clasificacionMinCiencias, CvLAC, SemilleroInvestigacion, SENAemail, centroDeFormacion } = req.body;
+  const {
+    username,
+    email,
+    password,
+    role,
+    telefono,
+    areaDeTrabajo,
+    clasificacionMinCiencias,
+    CvLAC,
+    SemilleroInvestigacion,
+    SENAemail,
+    centroDeFormacion,
+  } = req.body;
   if (!username || !email || !password || !role || !telefono) {
-    return res
-      .status(400)
-      .json({ message: "Nombre de usuario, correo, contraseña y rol son requeridos" });
+    return res.status(400).json({
+      message: "Nombre de usuario, correo, contraseña y rol son requeridos",
+    });
   }
 
   try {
@@ -21,7 +33,7 @@ export const registerUser = async (req, res) => {
       CvLAC,
       SemilleroInvestigacion,
       SENAemail,
-      centroDeFormacion
+      centroDeFormacion,
     );
     res.status(201).json(newUser);
   } catch (err) {
@@ -37,7 +49,7 @@ export const registerAdmin = async (req, res) => {
       username,
       email,
       password,
-      adminPassword
+      adminPassword,
     );
 
     if (!newUser) return res.status(403).json({ message: "Forbidden" });
@@ -56,7 +68,7 @@ export const registerSuperAdmin = async (req, res) => {
       email,
       password,
       adminPassword,
-      superAdminPassword
+      superAdminPassword,
     );
 
     if (!newUser) return res.status(403).json({ message: "Forbidden" });
@@ -75,7 +87,10 @@ export const login = async (req, res) => {
       .json({ message: "Correo y contraseña son requeridos" });
   }
   try {
-    const { token, userId, role, username } = await authService.login(SENAemail, password);
+    const { token, userId, role, username } = await authService.login(
+      SENAemail,
+      password,
+    );
     res.status(200).json({ token, userId, role, username });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -97,7 +112,8 @@ export const getSingleUser = async (req, res) => {
   const { id } = req.params;
   try {
     const user = await authService.getSingleUser(id);
-    if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
+    if (!user)
+      return res.status(404).json({ message: "Usuario no encontrado" });
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -215,5 +231,31 @@ export const updateUser = async (req, res) => {
     res.json(updatedUser);
   } catch (err) {
     res.status(404).json({ message: err.message });
+  }
+};
+
+export const changePasswordWithSession = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    return res
+      .status(400)
+      .json({ message: "La contraseña actual y la nueva son requeridas" });
+  }
+
+  const authHeader = req.headers["authorization"] || "";
+  if (!authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Token de sesión no válido" });
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const user = await authService.changePasswordWithSession(
+      token,
+      currentPassword,
+      newPassword,
+    );
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

@@ -488,6 +488,28 @@ export const authService = {
     }
   },
 
+  changePasswordWithSession: async (sessionToken, currentPassword, newPassword) => {
+    try {
+      const decoded = jwt.verify(sessionToken, TOKEN_SECRET);
+      const user = await User.findById(decoded.id);
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        throw new Error("Credenciales incorrectas");
+      }
+
+      const hashedPassword = await hashPassword(newPassword);
+      user.password = hashedPassword;
+      await user.save();
+      return user;
+    } catch (err) {
+      throw new Error("Invalid or expired token");
+    }
+  },
+
   updateUser: async (userId, updates) => {
     const user = await User.findById(userId);
     if (!user) {
