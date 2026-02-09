@@ -25,6 +25,8 @@ const convocatoriaSchema = new mongoose.Schema({
   tiposPoblacionesAtendidas: [{ type: String, maxlength: 1000, required: false }],
   numeroBeneficiariosDirectos: { type: Number, required: false },
   numeroBeneficiariosIndirectos: { type: Number, required: false },
+
+  programasRelacionados: [{ type: String, maxlength: 10000, required: false }],
 }, { timestamps: false });
 
 export const Convocatoria = mongoose.model('Convocatoria', convocatoriaSchema);

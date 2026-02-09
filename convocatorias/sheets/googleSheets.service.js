@@ -20,6 +20,9 @@ export const addConvocatoriaToSheet = async (convocatoria) => {
     const tiposPoblacionesAtendidas = Array.isArray(convocatoria.tiposPoblacionesAtendidas) 
         ? convocatoria.tiposPoblacionesAtendidas.join(', ') 
         : (convocatoria.tiposPoblacionesAtendidas || '');
+    const programasRelacionados = Array.isArray(convocatoria.programasRelacionados)
+        ? convocatoria.programasRelacionados.join(', ')
+        : (convocatoria.programasRelacionados || '');
 
     await googleSheetsClient.spreadsheets.values.append({
         spreadsheetId: SPREAD_SHEET_ID,
@@ -50,6 +53,7 @@ export const addConvocatoriaToSheet = async (convocatoria) => {
                 tiposPoblacionesAtendidas,
                 convocatoria.numeroBeneficiariosDirectos || '',
                 convocatoria.numeroBeneficiariosIndirectos || '',
+                programasRelacionados,
             ]]
         }
     });
@@ -91,6 +95,9 @@ export const updateConvocatoriaInSheet = async (convocatoria) => {
     const tiposPoblacionesAtendidas = Array.isArray(convocatoria.tiposPoblacionesAtendidas) 
         ? convocatoria.tiposPoblacionesAtendidas.join(', ') 
         : (convocatoria.tiposPoblacionesAtendidas || '');
+    const programasRelacionados = Array.isArray(convocatoria.programasRelacionados)
+        ? convocatoria.programasRelacionados.join(', ')
+        : (convocatoria.programasRelacionados || '');
 
     const range = `${SHEET_NAME}!A${rowIndex + 2}`;
     await googleSheetsClient.spreadsheets.values.update({
@@ -122,6 +129,7 @@ export const updateConvocatoriaInSheet = async (convocatoria) => {
                 tiposPoblacionesAtendidas,
                 convocatoria.numeroBeneficiariosDirectos || '',
                 convocatoria.numeroBeneficiariosIndirectos || '',
+                programasRelacionados,
             ]]
         }
     });

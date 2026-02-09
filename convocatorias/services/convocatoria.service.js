@@ -97,7 +97,7 @@ export const filterConvocatorias = async (filters) => {
     }
 
     // Campos de arrays de población objetivo
-    if (key === 'departamentosDeImpacto' || key === 'municipiosDeImpacto' || key === 'tiposPoblacionesAtendidas') {
+    if (key === 'departamentosDeImpacto' || key === 'municipiosDeImpacto' || key === 'tiposPoblacionesAtendidas' || key === 'programasRelacionados') {
       // Dividir por comas y limpiar espacios
       const valores = value.split(',').map(v => v.trim()).filter(v => v);
       if (valores.length > 0) {
