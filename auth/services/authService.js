@@ -215,6 +215,15 @@ export const authService = {
     console.log('🔄 Actualizando estado de usuario:', userId, 'nuevo estado:', newStatus);
     user.estado = newStatus;
     await user.save();
+
+    if (newStatus === "activo") {
+      try {
+        await authService.sendAccountActivatedEmail(user);
+      } catch (error) {
+        console.error('Error al enviar correo de activacion:', error.message);
+        console.error(error);
+      }
+    }
     
     // Sincronizar con Google Sheets
     try {
@@ -345,6 +354,13 @@ export const authService = {
       console.log('🔄 Activando usuario:', decoded.userId);
       user.estado = "activo";
       await user.save();
+
+      try {
+        await authService.sendAccountActivatedEmail(user);
+      } catch (error) {
+        console.error('Error al enviar correo de activacion:', error.message);
+        console.error(error);
+      }
       
       // Sincronizar con Google Sheets
       try {
@@ -462,6 +478,94 @@ export const authService = {
             © 2025 SENA. Todos los derechos reservados.
           </p>
         </div>
+      </td>
+    </tr>
+  </table>
+</body>
+    `,
+    };
+
+    await transporter.sendMail(mailOptions);
+  },
+
+  sendAccountActivatedEmail: async (user) => {
+    const accessUrl = `${FRONTEND_PROD_URL}/login`;
+    if (!user.email) {
+      throw new Error("No se encontró un correo válido para el usuario");
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: GOOGLE_CLIENT_EMAIL,
+        pass: GOOGLE_EMAIL_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: `"Sistema de Registro" <${GOOGLE_CLIENT_EMAIL}>`,
+      to: user.email,
+      subject: "Cuenta activada",
+      html: `
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="padding: 40px 20px;">
+        <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">
+          <tr>
+            <td style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); padding: 30px 40px; text-align: center;">
+              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-vYwiWubYsdjXt5KVWQXVbUcUqG5oDB.png" alt="SENA - Innovación y Competitividad" style="max-width: 200px; height: auto; display: block; margin: 0 auto;">
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 40px;">
+              <h1 style="color: #333333; font-size: 24px; font-weight: 600; margin: 0 0 20px 0; text-align: center;">
+                Tu cuenta ha sido activada
+              </h1>
+              <div style="background-color: #f8f9fa; border-left: 4px solid #4CAF50; padding: 20px; margin: 20px 0; border-radius: 4px;">
+                <p style="color: #555555; font-size: 16px; line-height: 1.6; margin: 0 0 10px 0;">
+                  Hola <strong style="color: #333333;">${user.username}</strong>, tu cuenta ya esta activa y puedes ingresar a la plataforma.
+                </p>
+                <p style="color: #555555; font-size: 16px; line-height: 1.6; margin: 0;">
+                  Haz clic en el boton para acceder:
+                </p>
+              </div>
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${accessUrl}"
+                  style="display: inline-block; 
+                        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
+                        color: white; 
+                        padding: 15px 30px; 
+                        text-decoration: none; 
+                        border-radius: 6px; 
+                        font-weight: 600; 
+                        font-size: 16px; 
+                        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                        transition: all 0.3s ease;">
+                  Ingresar a la plataforma
+                </a>
+              </div>
+              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <p style="color: #666666; font-size: 14px; line-height: 1.5; margin: 0;">
+                  Si el boton no funciona, puedes copiar y pegar el siguiente enlace en tu navegador:
+                </p>
+                <p style="word-break: break-all; background-color: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #333333; margin: 10px 0 0 0;">
+                  ${accessUrl}
+                </p>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #f8f9fa; padding: 30px 40px; text-align: center; border-top: 1px solid #e0e0e0;">
+              <p style="color: #666666; font-size: 14px; margin: 0 0 10px 0;">
+                SENA - Servicio Nacional de Aprendizaje
+              </p>
+              <p style="color: #999999; font-size: 12px; margin: 0;">
+                Este es un correo automatico, por favor no responder a este mensaje.
+              </p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
