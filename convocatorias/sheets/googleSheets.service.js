@@ -1,6 +1,141 @@
 import { googleSheetsClient } from '../../libs/google/googleSheetsAPIClient.plugin.js';
 import { SPREAD_SHEET_ID, SHEET_NAME } from '../../config/token.js';
 
+const BENEFICIARIOS_SHEET_NAME = process.env.SHEET_NAME_BENEFICIARIOS_MUNICIPIO || 'BeneficiariosPorMunicipio';
+const BENEFICIARIOS_HEADERS = [
+    'convocatoria_id',
+    'convocatoria',
+    'consecutivo',
+    'nombre_proyecto',
+    'year',
+    'municipio',
+    'beneficiarios_directos',
+    'beneficiarios_indirectos',
+    'beneficiarios_totales',
+];
+
+const normalizeBeneficiariosRows = (convocatoria) => {
+    if (!Array.isArray(convocatoria.beneficiariosPorMunicipio)) {
+        return [];
+    }
+
+    return convocatoria.beneficiariosPorMunicipio.map((item) => {
+        const directos = Number(item?.directos) || 0;
+        const indirectos = Number(item?.indirectos) || 0;
+
+        return [
+            convocatoria._id.toString(),
+            convocatoria.convocatoria || '',
+            convocatoria.consecutivo || '',
+            convocatoria.nombre || '',
+            convocatoria.year || '',
+            item?.municipio || '',
+            directos,
+            indirectos,
+            directos + indirectos,
+        ];
+    });
+};
+
+const removeBeneficiariosRowsFromSheet = async (convocatoriaId) => {
+    const sheetId = await getSheetIdByName(BENEFICIARIOS_SHEET_NAME);
+    if (sheetId === undefined) return;
+
+    const rows = await googleSheetsClient.spreadsheets.values.get({
+        spreadsheetId: SPREAD_SHEET_ID,
+        range: `${BENEFICIARIOS_SHEET_NAME}!A2:G50000`,
+    });
+
+    const values = rows.data.values || [];
+    const matches = values
+        .map((row, index) => ({ row, index }))
+        .filter(({ row }) => row[0] === convocatoriaId.toString());
+
+    if (matches.length === 0) return;
+
+    const requests = matches
+        .sort((a, b) => b.index - a.index)
+        .map(({ index }) => ({
+            deleteDimension: {
+                range: {
+                    sheetId,
+                    dimension: 'ROWS',
+                    startIndex: index + 1,
+                    endIndex: index + 2,
+                },
+            },
+        }));
+
+    await googleSheetsClient.spreadsheets.batchUpdate({
+        spreadsheetId: SPREAD_SHEET_ID,
+        requestBody: { requests },
+    });
+};
+
+const syncBeneficiariosRowsInSheet = async (convocatoria) => {
+    await ensureSheetExists(BENEFICIARIOS_SHEET_NAME, BENEFICIARIOS_HEADERS);
+    await upsertBeneficiariosHeaders();
+    await removeBeneficiariosRowsFromSheet(convocatoria._id);
+
+    const beneficiariosRows = normalizeBeneficiariosRows(convocatoria);
+    if (beneficiariosRows.length === 0) return;
+
+    await googleSheetsClient.spreadsheets.values.append({
+        spreadsheetId: SPREAD_SHEET_ID,
+        range: `${BENEFICIARIOS_SHEET_NAME}!A1`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+            values: beneficiariosRows,
+        },
+    });
+};
+
+const upsertBeneficiariosHeaders = async () => {
+    await googleSheetsClient.spreadsheets.values.update({
+        spreadsheetId: SPREAD_SHEET_ID,
+        range: `${BENEFICIARIOS_SHEET_NAME}!A1`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+            values: [BENEFICIARIOS_HEADERS],
+        },
+    });
+};
+
+const ensureSheetExists = async (sheetName, headers = []) => {
+    const existingSheetId = await getSheetIdByName(sheetName);
+    if (existingSheetId !== undefined) {
+        return existingSheetId;
+    }
+
+    const createSheetResponse = await googleSheetsClient.spreadsheets.batchUpdate({
+        spreadsheetId: SPREAD_SHEET_ID,
+        requestBody: {
+            requests: [
+                {
+                    addSheet: {
+                        properties: {
+                            title: sheetName,
+                        },
+                    },
+                },
+            ],
+        },
+    });
+
+    if (Array.isArray(headers) && headers.length > 0) {
+        await googleSheetsClient.spreadsheets.values.update({
+            spreadsheetId: SPREAD_SHEET_ID,
+            range: `${sheetName}!A1`,
+            valueInputOption: 'USER_ENTERED',
+            requestBody: {
+                values: [headers],
+            },
+        });
+    }
+
+    return createSheetResponse.data?.replies?.[0]?.addSheet?.properties?.sheetId;
+};
+
 export const addConvocatoriaToSheet = async (convocatoria) => {
     // Asegurar que user_id sea un string y no un objeto completo
     const userIdValue = convocatoria.user_id && typeof convocatoria.user_id === 'object'
@@ -23,6 +158,9 @@ export const addConvocatoriaToSheet = async (convocatoria) => {
     const programasRelacionados = Array.isArray(convocatoria.programasRelacionados)
         ? convocatoria.programasRelacionados.join(', ')
         : (convocatoria.programasRelacionados || '');
+    const beneficiariosPorMunicipio = Array.isArray(convocatoria.beneficiariosPorMunicipio)
+        ? JSON.stringify(convocatoria.beneficiariosPorMunicipio)
+        : '';
 
     await googleSheetsClient.spreadsheets.values.append({
         spreadsheetId: SPREAD_SHEET_ID,
@@ -54,9 +192,12 @@ export const addConvocatoriaToSheet = async (convocatoria) => {
                 convocatoria.numeroBeneficiariosDirectos || '',
                 convocatoria.numeroBeneficiariosIndirectos || '',
                 programasRelacionados,
+                beneficiariosPorMunicipio,
             ]]
         }
     });
+
+    await syncBeneficiariosRowsInSheet(convocatoria);
 };
 
 const getSheetIdByName = async (sheetName) => {
@@ -72,7 +213,7 @@ const getSheetIdByName = async (sheetName) => {
 export const updateConvocatoriaInSheet = async (convocatoria) => {
     const rows = await googleSheetsClient.spreadsheets.values.get({
         spreadsheetId: SPREAD_SHEET_ID,
-        range: `${SHEET_NAME}!A2:Z1000`,
+        range: `${SHEET_NAME}!A2:AA1000`,
     });
 
     const values = rows.data.values;
@@ -98,6 +239,9 @@ export const updateConvocatoriaInSheet = async (convocatoria) => {
     const programasRelacionados = Array.isArray(convocatoria.programasRelacionados)
         ? convocatoria.programasRelacionados.join(', ')
         : (convocatoria.programasRelacionados || '');
+    const beneficiariosPorMunicipio = Array.isArray(convocatoria.beneficiariosPorMunicipio)
+        ? JSON.stringify(convocatoria.beneficiariosPorMunicipio)
+        : '';
 
     const range = `${SHEET_NAME}!A${rowIndex + 2}`;
     await googleSheetsClient.spreadsheets.values.update({
@@ -130,9 +274,12 @@ export const updateConvocatoriaInSheet = async (convocatoria) => {
                 convocatoria.numeroBeneficiariosDirectos || '',
                 convocatoria.numeroBeneficiariosIndirectos || '',
                 programasRelacionados,
+                beneficiariosPorMunicipio,
             ]]
         }
     });
+
+    await syncBeneficiariosRowsInSheet(convocatoria);
 };
 
 export const deleteConvocatoriaFromSheet = async (id) => {
@@ -165,4 +312,6 @@ export const deleteConvocatoriaFromSheet = async (id) => {
             ],
         },
     });
+
+    await removeBeneficiariosRowsFromSheet(id);
 };

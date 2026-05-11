@@ -45,7 +45,14 @@ export const createConvocatoriaController = async (req, res) => {
     const convocatoria = await createConvocatoria(data, userId);
     res.status(201).json(convocatoria);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    const message = error.message || "Unexpected error";
+    const isValidationError =
+      message.includes("must") ||
+      message.includes("duplicado") ||
+      message.includes("no existe en municipiosDeImpacto") ||
+      message.includes("cannot be negative");
+
+    res.status(isValidationError ? 400 : 500).json({ message });
   }
 };
 
@@ -66,7 +73,14 @@ export const updateConvocatoriaController = async (req, res) => {
     const updated = await updateConvocatoria(id, data);
     res.json(updated);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    const message = error.message || "Unexpected error";
+    const isValidationError =
+      message.includes("must") ||
+      message.includes("duplicado") ||
+      message.includes("no existe en municipiosDeImpacto") ||
+      message.includes("cannot be negative");
+
+    res.status(isValidationError ? 400 : 500).json({ message });
   }
 };
 

@@ -8,6 +8,78 @@ import {
   deleteConvocatoriaFromSheet,
 } from "../sheets/googleSheets.service.js";
 
+const parseBeneficiariosNumber = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const normalizeBeneficiariosPorMunicipio = (beneficiariosPorMunicipio) => {
+  if (!Array.isArray(beneficiariosPorMunicipio)) {
+    throw new Error("beneficiariosPorMunicipio must be an array");
+  }
+
+  return beneficiariosPorMunicipio.map((item) => {
+    const municipio = (item?.municipio || "").trim();
+    const directos = parseBeneficiariosNumber(item?.directos);
+    const indirectos = parseBeneficiariosNumber(item?.indirectos);
+
+    if (!municipio) {
+      throw new Error("Each beneficiariosPorMunicipio item must include municipio");
+    }
+
+    if (directos < 0 || indirectos < 0) {
+      throw new Error("Beneficiary values cannot be negative");
+    }
+
+    return {
+      municipio,
+      directos,
+      indirectos,
+    };
+  });
+};
+
+const validateBeneficiariosPorMunicipio = (beneficiariosPorMunicipio, municipiosDeImpacto) => {
+  if (!Array.isArray(beneficiariosPorMunicipio) || beneficiariosPorMunicipio.length === 0) {
+    return;
+  }
+
+  const seenMunicipios = new Set();
+  for (const item of beneficiariosPorMunicipio) {
+    const normalizedMunicipio = item.municipio.trim().toLowerCase();
+    if (seenMunicipios.has(normalizedMunicipio)) {
+      throw new Error(`Municipio duplicado en beneficiariosPorMunicipio: ${item.municipio}`);
+    }
+    seenMunicipios.add(normalizedMunicipio);
+  }
+
+  if (Array.isArray(municipiosDeImpacto) && municipiosDeImpacto.length > 0) {
+    const municipiosPermitidos = new Set(
+      municipiosDeImpacto.map((municipio) => String(municipio).trim().toLowerCase())
+    );
+
+    for (const item of beneficiariosPorMunicipio) {
+      const municipio = item.municipio.trim().toLowerCase();
+      if (!municipiosPermitidos.has(municipio)) {
+        throw new Error(
+          `El municipio ${item.municipio} no existe en municipiosDeImpacto`
+        );
+      }
+    }
+  }
+};
+
+const calculateBeneficiariosTotals = (beneficiariosPorMunicipio) => {
+  return beneficiariosPorMunicipio.reduce(
+    (acc, item) => {
+      acc.directos += parseBeneficiariosNumber(item.directos);
+      acc.indirectos += parseBeneficiariosNumber(item.indirectos);
+      return acc;
+    },
+    { directos: 0, indirectos: 0 }
+  );
+};
+
 export const getAllConvocatorias = async () => {
   return await Convocatoria.find().populate("user_id");
 };
@@ -16,12 +88,25 @@ export const createConvocatoria = async (data, userId) => {
   const valorSolicitado = parseFloat(data.valor_solicitado) || 0;
   const valorAprobado = parseFloat(data.valor_aprobado) || 0;
   const diferenciaPresupuesto = valorSolicitado - valorAprobado;
+  const payload = { ...data };
+
+  if (payload.beneficiariosPorMunicipio !== undefined) {
+    const beneficiariosPorMunicipio = normalizeBeneficiariosPorMunicipio(
+      payload.beneficiariosPorMunicipio
+    );
+    validateBeneficiariosPorMunicipio(beneficiariosPorMunicipio, payload.municipiosDeImpacto);
+    const totals = calculateBeneficiariosTotals(beneficiariosPorMunicipio);
+
+    payload.beneficiariosPorMunicipio = beneficiariosPorMunicipio;
+    payload.numeroBeneficiariosDirectos = totals.directos;
+    payload.numeroBeneficiariosIndirectos = totals.indirectos;
+  }
 
   // Si no se proporciona el año, usar el año actual
   const year = data.year || new Date().getFullYear();
 
   const nuevaConvocatoria = new Convocatoria({
-    ...data,
+    ...payload,
     user_id: userId,
     diferencia_presupuesto: diferenciaPresupuesto,
     year: year,
@@ -38,6 +123,30 @@ export const updateConvocatoria = async (id, data) => {
   if (!convocatoria) throw new Error("Convocatoria not found");
 
   Object.assign(convocatoria, data);
+
+  if (data.beneficiariosPorMunicipio !== undefined) {
+    const beneficiariosPorMunicipio = normalizeBeneficiariosPorMunicipio(
+      convocatoria.beneficiariosPorMunicipio
+    );
+    validateBeneficiariosPorMunicipio(
+      beneficiariosPorMunicipio,
+      convocatoria.municipiosDeImpacto
+    );
+    const totals = calculateBeneficiariosTotals(beneficiariosPorMunicipio);
+
+    convocatoria.beneficiariosPorMunicipio = beneficiariosPorMunicipio;
+    convocatoria.numeroBeneficiariosDirectos = totals.directos;
+    convocatoria.numeroBeneficiariosIndirectos = totals.indirectos;
+  } else if (
+    data.municipiosDeImpacto !== undefined &&
+    Array.isArray(convocatoria.beneficiariosPorMunicipio) &&
+    convocatoria.beneficiariosPorMunicipio.length > 0
+  ) {
+    validateBeneficiariosPorMunicipio(
+      convocatoria.beneficiariosPorMunicipio,
+      convocatoria.municipiosDeImpacto
+    );
+  }
 
   const valorSolicitado = parseFloat(convocatoria.valor_solicitado) || 0;
   const valorAprobado = parseFloat(convocatoria.valor_aprobado) || 0;

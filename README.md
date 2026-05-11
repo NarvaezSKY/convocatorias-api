@@ -149,6 +149,7 @@ EMAIL_FROM=noreply@convocatorias.com
 # Google Sheets Configuration
 SPREAD_SHEET_ID=your_google_sheet_id_here
 SHEET_NAME=Convocatorias
+SHEET_NAME_BENEFICIARIOS_MUNICIPIO=BeneficiariosPorMunicipio
 
 # Frontend URL (for CORS)
 FRONTEND_URL=http://localhost:5173

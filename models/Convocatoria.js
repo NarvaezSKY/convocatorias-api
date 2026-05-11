@@ -1,5 +1,11 @@
 import mongoose from 'mongoose';
 
+const beneficiarioMunicipioSchema = new mongoose.Schema({
+  municipio: { type: String, required: true, maxlength: 1000 },
+  directos: { type: Number, required: false, min: 0, default: 0 },
+  indirectos: { type: Number, required: false, min: 0, default: 0 },
+}, { _id: false });
+
 const convocatoriaSchema = new mongoose.Schema({
   convocatoria: { type: String, required: true },
   consecutivo: { type: String, maxlength: 50 },
@@ -25,6 +31,7 @@ const convocatoriaSchema = new mongoose.Schema({
   tiposPoblacionesAtendidas: [{ type: String, maxlength: 1000, required: false }],
   numeroBeneficiariosDirectos: { type: Number, required: false },
   numeroBeneficiariosIndirectos: { type: Number, required: false },
+  beneficiariosPorMunicipio: [beneficiarioMunicipioSchema],
 
   programasRelacionados: [{ type: String, maxlength: 10000, required: false }],
 }, { timestamps: false });
