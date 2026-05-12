@@ -7,6 +7,10 @@ const BENEFICIARIOS_HEADERS = [
     'convocatoria',
     'consecutivo',
     'nombre_proyecto',
+    'centro_formacion',
+    'tipos_poblaciones_atendidas',
+    'valor_solicitado',
+    'valor_aprobado',
     'year',
     'municipio',
     'beneficiarios_directos',
@@ -19,6 +23,10 @@ const normalizeBeneficiariosRows = (convocatoria) => {
         return [];
     }
 
+    const tiposPoblacionesAtendidas = Array.isArray(convocatoria.tiposPoblacionesAtendidas)
+        ? convocatoria.tiposPoblacionesAtendidas.join(', ')
+        : (convocatoria.tiposPoblacionesAtendidas || '');
+
     return convocatoria.beneficiariosPorMunicipio.map((item) => {
         const directos = Number(item?.directos) || 0;
         const indirectos = Number(item?.indirectos) || 0;
@@ -28,6 +36,10 @@ const normalizeBeneficiariosRows = (convocatoria) => {
             convocatoria.convocatoria || '',
             convocatoria.consecutivo || '',
             convocatoria.nombre || '',
+            convocatoria.direccion_oficina_regional || '',
+            tiposPoblacionesAtendidas,
+            convocatoria.valor_solicitado || '',
+            convocatoria.valor_aprobado || '',
             convocatoria.year || '',
             item?.municipio || '',
             directos,
@@ -43,7 +55,7 @@ const removeBeneficiariosRowsFromSheet = async (convocatoriaId) => {
 
     const rows = await googleSheetsClient.spreadsheets.values.get({
         spreadsheetId: SPREAD_SHEET_ID,
-        range: `${BENEFICIARIOS_SHEET_NAME}!A2:G50000`,
+        range: `${BENEFICIARIOS_SHEET_NAME}!A2:M50000`,
     });
 
     const values = rows.data.values || [];
