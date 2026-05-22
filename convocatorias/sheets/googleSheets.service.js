@@ -16,6 +16,7 @@ const BENEFICIARIOS_HEADERS = [
     'beneficiarios_directos',
     'beneficiarios_indirectos',
     'beneficiarios_totales',
+    'caso_o_sentencia',
 ];
 
 const CONVOCATORIAS_HEADERS = [
@@ -74,6 +75,7 @@ const normalizeBeneficiariosRows = (convocatoria) => {
             directos,
             indirectos,
             directos + indirectos,
+            convocatoria.caso_o_sentencia || '',
         ];
     });
 };
@@ -84,7 +86,7 @@ const removeBeneficiariosRowsFromSheet = async (convocatoriaId) => {
 
     const rows = await googleSheetsClient.spreadsheets.values.get({
         spreadsheetId: SPREAD_SHEET_ID,
-        range: `${BENEFICIARIOS_SHEET_NAME}!A2:M50000`,
+        range: `${BENEFICIARIOS_SHEET_NAME}!A2:Z50000`,
     });
 
     const values = rows.data.values || [];
