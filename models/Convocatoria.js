@@ -12,6 +12,7 @@ const convocatoriaSchema = new mongoose.Schema({
   direccion_oficina_regional: { type: String, maxlength: 200 },
   tipo_postulacion: { type: String, maxlength: 50 },
   nuevo_estado: { type: String, maxlength: 50 },
+  caso_o_sentencia: { type: String, maxlength: 100 },
   nombre: { type: String, maxlength: 800 },
   fecha_aprobacion: { type: String },
   fecha_inicio: { type: String },

@@ -18,6 +18,35 @@ const BENEFICIARIOS_HEADERS = [
     'beneficiarios_totales',
 ];
 
+const CONVOCATORIAS_HEADERS = [
+    'id',
+    'convocatoria',
+    'consecutivo',
+    'direccion_oficina_regional',
+    'tipo_postulacion',
+    'nuevo_estado',
+    'nombre',
+    'fecha_aprobacion',
+    'fecha_inicio',
+    'fecha_fin',
+    'observaciones',
+    'user_id',
+    'url',
+    'valor_solicitado',
+    'valor_aprobado',
+    'diferencia_presupuesto',
+    'year',
+    'users_count',
+    'departamentosDeImpacto',
+    'municipiosDeImpacto',
+    'tiposPoblacionesAtendidas',
+    'numeroBeneficiariosDirectos',
+    'numeroBeneficiariosIndirectos',
+    'programasRelacionados',
+    'beneficiariosPorMunicipio',
+    'caso_o_sentencia',
+];
+
 const normalizeBeneficiariosRows = (convocatoria) => {
     if (!Array.isArray(convocatoria.beneficiariosPorMunicipio)) {
         return [];
@@ -113,6 +142,17 @@ const upsertBeneficiariosHeaders = async () => {
     });
 };
 
+const upsertConvocatoriasHeaders = async () => {
+    await googleSheetsClient.spreadsheets.values.update({
+        spreadsheetId: SPREAD_SHEET_ID,
+        range: `${SHEET_NAME}!A1`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+            values: [CONVOCATORIAS_HEADERS],
+        },
+    });
+};
+
 const ensureSheetExists = async (sheetName, headers = []) => {
     const existingSheetId = await getSheetIdByName(sheetName);
     if (existingSheetId !== undefined) {
@@ -149,6 +189,9 @@ const ensureSheetExists = async (sheetName, headers = []) => {
 };
 
 export const addConvocatoriaToSheet = async (convocatoria) => {
+    await ensureSheetExists(SHEET_NAME, CONVOCATORIAS_HEADERS);
+    await upsertConvocatoriasHeaders();
+
     // Asegurar que user_id sea un string y no un objeto completo
     const userIdValue = convocatoria.user_id && typeof convocatoria.user_id === 'object'
         ? (convocatoria.user_id._id?.toString() || '')
@@ -205,6 +248,7 @@ export const addConvocatoriaToSheet = async (convocatoria) => {
                 convocatoria.numeroBeneficiariosIndirectos || '',
                 programasRelacionados,
                 beneficiariosPorMunicipio,
+                convocatoria.caso_o_sentencia || '',
             ]]
         }
     });
@@ -223,6 +267,9 @@ const getSheetIdByName = async (sheetName) => {
 
 
 export const updateConvocatoriaInSheet = async (convocatoria) => {
+    await ensureSheetExists(SHEET_NAME, CONVOCATORIAS_HEADERS);
+    await upsertConvocatoriasHeaders();
+
     const rows = await googleSheetsClient.spreadsheets.values.get({
         spreadsheetId: SPREAD_SHEET_ID,
         range: `${SHEET_NAME}!A2:AA1000`,
@@ -287,6 +334,7 @@ export const updateConvocatoriaInSheet = async (convocatoria) => {
                 convocatoria.numeroBeneficiariosIndirectos || '',
                 programasRelacionados,
                 beneficiariosPorMunicipio,
+                convocatoria.caso_o_sentencia || '',
             ]]
         }
     });
