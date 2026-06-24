@@ -1,2 +1,7 @@
-node_modules
+node_modules/
 .env
+*.log
+.DS_Store
+yarn-debug.log*
+yarn-error.log*
+convocatorias-460619-ffaa5974c73a.json
